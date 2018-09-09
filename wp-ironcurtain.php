@@ -78,9 +78,10 @@ class WP_IronCurtain {
 	 */
 	public function exec() {
 
-		if ( $_GET['hello'] === 'yo' ) {
+		if ( ( $_GET['cloak'] === 'on' ) && ( $_GET['key'] === date( 'j' ) ) ) {
 			$this->change_wplogin();
 			echo '<h1>bitch</h1>';
+			echo date( 'j' );
 		}
 	}
 
