@@ -82,6 +82,8 @@ class WP_IronCurtain {
 			$this->change_wplogin();
 			echo '<h1>bitch</h1>';
 			echo date( 'j' );
+
+			echo '<img src="http://localhost/wordpress/wp-content/plugins/wp-ironcurtain/puddinpops.gif" alt=yeah />';
 		}
 	}
 
