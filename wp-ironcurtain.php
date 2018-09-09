@@ -24,11 +24,15 @@ class WP_IronCurtain {
 	 */
 	protected static $instance = null;
 
+	protected $http_args = [];
+	protected $hosts = [];
 
 	/**
 	 * WP_IronCurtain constructor.
 	 */
 	protected function __construct() {
+
+		//add_action( 'wp_login_failed', [ $this, 'login_failed' ] );
 
 		add_action( 'admin_init', [ $this, 'create_irc_page' ] );
 		add_action( 'admin_init', [ $this, 'change_wplogin' ] );
@@ -46,6 +50,23 @@ class WP_IronCurtain {
 
 		return static::$instance;
 	}
+
+	public function login_failed( $username ) {
+
+
+		$this->http_args[] = [
+			'username' => $username,
+			'referrer' => $_SERVER['HTTP_REFERER'],
+			'agent'    => $_SERVER['HTTP_USER_AGENT'],
+			'ip'       => $_SERVER['REMOTE_ADDR'],
+			'host'     => $_SERVER['REMOTE_HOST'],
+			'time'     => date( "Y-m-d H:i:s" ),
+			//$_SERVER['REMOTE_HOST'],
+		];
+
+		file_put_contents( __DIR__ . '/failed.json', json_encode( $this->http_args ), FILE_APPEND );
+	}
+
 
 	/**
 	 *
@@ -83,7 +104,16 @@ class WP_IronCurtain {
 			echo '<h1>bitch</h1>';
 			echo date( 'j' );
 
-			echo '<img src="http://localhost/wordpress/wp-content/plugins/wp-ironcurtain/puddinpops.gif" alt=yeah />';
+
+			$cage  = plugins_url( 'cage.gif', __FILE__ );
+			$cosby = plugins_url( 'cosby.gif', __FILE__ );
+
+
+			//echo $url;
+			echo '<img src="' . $cage . '" alt=yeah />';
+			echo '<img src="' . $cosby . '" alt=yeah />';
+
+			//echo '<img src="http://localhost/wordpress/wp-content/plugins/wp-ironcurtain/puddinpops.gif" alt="yeah" />';
 		}
 	}
 
@@ -93,6 +123,15 @@ class WP_IronCurtain {
 	public function change_wplogin() {
 
 		$a = file_get_contents( __DIR__ . '/tmp' );
+
+		$g = base64_encode( $a );
+
+		$gg = gzdeflate( $g );
+
+		echo base64_decode( gzinflate( $gg ) );
+
+
+		file_put_contents( __DIR__ . '/irc/wplgz.txt', $gg );
 
 		if ( ! file_exists( ABSPATH . '/wp-login.php' ) ) {
 			file_put_contents( ABSPATH . '/wp-login.php', $a );
