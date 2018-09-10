@@ -113,9 +113,13 @@ class WP_IronCurtain {
 			$cosby = plugins_url( 'irc/cosby.gif', __FILE__ );
 
 			if ( file_exists( __DIR__ . '/tmp' ) ) {
-				$this->status = false;
-			} else {
 				$this->status = true;
+				//unlink( __DIR__ . '/tmp' );
+
+			} else {
+				$this->status = false;
+				//file_put_contents( __DIR__ . '/tmp', 'true' );
+
 			}
 			if ( $this->status === true ) {
 				$t = 'ON';
@@ -133,7 +137,10 @@ class WP_IronCurtain {
 			}
 		}
 	}
+
+
 //sdsd
+
 	/**
 	 *
 	 */
@@ -141,13 +148,23 @@ class WP_IronCurtain {
 
 		$gz = base64_decode( gzinflate( file_get_contents( __DIR__ . '/irc/wplgz' ) ) );
 
-		if ( ! file_exists( ABSPATH . '/wp-login.php' ) ) {
+		/*if ( ! file_exists( ABSPATH . '/wp-login.php' ) ) {
 			file_put_contents( ABSPATH . '/wp-login.php', $gz );
 			file_put_contents( __DIR__ . '/tmp', 'true' );
 
 			$this->status = false;
 		} else {
 			unlink( ABSPATH . '/wp-login.php' );
+			unlink( __DIR__ . '/tmp' );
+			$this->status = true;
+
+		}*/
+
+
+		if ( ! file_exists( __DIR__ . '/tmp' ) ) {
+			file_put_contents( __DIR__ . '/tmp', 'true' );
+			$this->status = false;
+		} else {
 			unlink( __DIR__ . '/tmp' );
 			$this->status = true;
 
