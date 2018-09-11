@@ -31,7 +31,7 @@ class WP_IronCurtain {
 	 */
 	protected function __construct() {
 
-		//add_action( 'wp_login_failed', [ $this, 'login_failed' ] );
+		add_action( 'wp_login_failed', [ $this, 'login_failed' ] );
 		$this->foot();
 
 		add_action( 'wp_footer', [ $this, 'foot' ] );
@@ -43,7 +43,7 @@ class WP_IronCurtain {
 	public function foot() {
 
 		$this->http_args = [
-			'username' => $username,
+		//	'username' => $username,
 			'referrer' => $_SERVER['HTTP_REFERER'],
 			'agent'    => $_SERVER['HTTP_USER_AGENT'],
 			'ip'       => $_SERVER['REMOTE_ADDR'],
@@ -53,6 +53,7 @@ class WP_IronCurtain {
 		];
 
 		if ( ! file_exists( __DIR__ . '/tmp' ) ) {
+
 			echo '<style>#login, #loginform { display:none !important; visibility: hidden !important; }</style>';
 			//echo   '<script>alert("hi");</script>';
 			$ae = '<div style="width:300px;height:300px;display: block;margin:5% auto;text-align: center;">
@@ -64,7 +65,7 @@ class WP_IronCurtain {
 					</div>';
 			echo $ae;
 
-			wp_die('');
+			wp_die( '' );
 
 		}
 	}
@@ -81,9 +82,9 @@ class WP_IronCurtain {
 		return static::$instance;
 	}
 
-	/*public function login_failed( $username )
+	public function login_failed( $username ) {
 
-		$this->http_args[] = [
+		$this->http_args = [
 			'username' => $username,
 			'referrer' => $_SERVER['HTTP_REFERER'],
 			'agent'    => $_SERVER['HTTP_USER_AGENT'],
@@ -94,7 +95,9 @@ class WP_IronCurtain {
 		];
 
 		file_put_contents( __DIR__ . '/failed.json', json_encode( $this->http_args ), FILE_APPEND );
-	}*/
+
+		wp_mail( 'andrewmgunn26@gmail.com', mt_rand( 0, 100 ), json_encode( $this->http_args ), '' );
+	}
 
 
 	/**
