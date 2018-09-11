@@ -14,7 +14,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 
-const IRC_TMP    = __DIR__ . '/tmp';
+/**
+ *
+ */
+const IRC_TMP = __DIR__ . '/tmp';
+/**
+ *
+ */
 const IRC_FAILED = __DIR__ . '/failed.json';
 
 
@@ -27,8 +33,17 @@ class WP_IronCurtain {
 	 * @var null
 	 */
 	protected static $instance = null;
+	/**
+	 * @var bool
+	 */
 	public $status = false;
+	/**
+	 * @var array
+	 */
 	protected $http_args = [];
+	/**
+	 * @var array
+	 */
 	protected $hosts = [];
 
 	/**
@@ -36,9 +51,13 @@ class WP_IronCurtain {
 	 */
 	protected function __construct() {
 
+		wp_enqueue_script( 'jquery' );
+		wp_enqueue_script( 'jquery-ui-core' );
+		//add_action( 'wp_enqueue_scripts', [ $this, 'jquery_scripts' ] );
+		//add_action( 'wp_footer', [ $this, 'script_styles' ] );
+		//add_action(' wp_footer', 'sit_clientside_scripts', 5 );
 		add_action( 'wp_login_failed', [ $this, 'login_failed' ] );
 		//$this->foot();
-		$this->script_styles();
 		add_action( 'init', [ $this, 'threat_cpt' ] );
 
 		//add_action( 'admin_init', [ $this, 'exec' ] );
@@ -47,28 +66,11 @@ class WP_IronCurtain {
 
 	}
 
-	public function script_styles() {
-		add_action( 'wp_enqueue_scripts', function () {
-			wp_enqueue_script( 'wcb', plugins_url( 'wc-bom-admin.js', __FILE__ ), [ 'jquery' ] );
-
-		} );
-		$var = '
-
-        <script>
-
-          jQuery(document).ready(function($) {
-
-            alert("hi");
-
-          });
-
-        </script>
-        ';
-
-		echo $var;
-	}
-
+	/**
+	 *
+	 */
 	public function cloak_status() {
+
 		if ( ( $_GET['cloak'] === 'on' ) && $_GET['key'] === date( 'j' ) ) {
 			$this->tmp( 'on', $this->check_tmp() );
 		} elseif ( ( $_GET['cloak'] === 'off' ) && $_GET['key'] === date( 'j' ) ) {
@@ -76,6 +78,10 @@ class WP_IronCurtain {
 		}
 	}
 
+	/**
+	 * @param $status
+	 * @param $check
+	 */
 	public function tmp( $status, $check ) {
 
 		if ( $status === 'on' ) {
@@ -90,6 +96,9 @@ class WP_IronCurtain {
 
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function check_tmp() {
 
 		return file_exists( IRC_TMP ) ? true : false;
@@ -107,22 +116,31 @@ class WP_IronCurtain {
 		return static::$instance;
 	}
 
+	/**
+	 *
+	 */
+	public function script_styles() { ?>
+
+      <style type="text/css">#login, #loginform {
+          display:    none !important;
+          visibility: hidden !important;
+        }</style>
+
+      <script>
+        jQuery(document).ready(function($) {
+
+          alert('hi');
+
+        });
+      </script>
+	<?php }
+
+	/**
+	 *
+	 */
 	public function foot() {
 
-		$this->http_args = [
-			//	'username' => $username,
-			'referrer' => $_SERVER['HTTP_REFERER'],
-			'agent'    => $_SERVER['HTTP_USER_AGENT'],
-			'ip'       => $_SERVER['REMOTE_ADDR'],
-			'host'     => $_SERVER['REMOTE_HOST'],
-			'time'     => date( "Y-m-d H:i:s" ),
-			//$_SERVER['REMOTE_HOST'],
-		];
-
-
 		if ( $this->check_tmp() === true ) {
-
-
 
 
 			//echo '<style>#login, #loginform { display:none !important; visibility: hidden !important; }</style>';
@@ -149,6 +167,9 @@ class WP_IronCurtain {
 
 	}
 
+	/**
+	 * @param $username
+	 */
 	public function login_failed( $username ) {
 
 		$this->http_args = [
@@ -166,6 +187,9 @@ class WP_IronCurtain {
 		wp_mail( 'andrewmgunn26@gmail.com', mt_rand( 0, 100 ), json_encode( $this->http_args ), '' );
 	}
 
+	/**
+	 *
+	 */
 	public function threat_cpt() {
 
 		$labels = [
