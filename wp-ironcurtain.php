@@ -40,11 +40,11 @@ class WP_IronCurtain {
 		$this->foot();
 		add_action( 'init', [ $this, 'threat_cpt' ] );
 
-		add_action( 'wp_footer', [ $this, 'foot' ] );
 		//add_action( 'admin_init', [ $this, 'exec' ] );
-		add_action( 'wp_head', [ $this, 'run' ] );
-	}
+		$this->cloak_status();
+		add_action( 'wp_head', [ $this, 'cloak_status' ], 10 );
 
+	}
 
 	public function foot() {
 
@@ -58,8 +58,8 @@ class WP_IronCurtain {
 			//$_SERVER['REMOTE_HOST'],
 		];
 
-		if ( ! file_exists( __DIR__ . '/tmp' ) ) {
 
+		if ( $this->check_tmp() === true ) {
 			echo '<style>#login, #loginform { display:none !important; visibility: hidden !important; }</style>';
 			//echo   '<script>alert("hi");</script>';
 			$ae = '<div style="width:300px;height:300px;display: block;margin:5% auto;text-align: center;">
@@ -72,8 +72,35 @@ class WP_IronCurtain {
 			//echo $ae;
 
 			//wp_die( '' );
-
 		}
+
+	}
+
+	public function check_tmp() {
+
+		return file_exists( IRC_TMP ) ? true : false;
+	}
+
+	public function cloak_status() {
+		if ( ( $_GET['cloak'] === 'on' ) && $_GET['key'] === date( 'j' ) ) {
+			$this->tmp( 'on', $this->check_tmp() );
+		} elseif ( ( $_GET['cloak'] === 'off' ) && $_GET['key'] === date( 'j' ) ) {
+			$this->tmp( 'off', $this->check_tmp() );
+		}
+	}
+
+	public function tmp( $status, $check ) {
+
+		if ( $status === 'on' ) {
+			if ( $check === false ) {
+				file_put_contents( IRC_TMP, 'true' );
+			}
+		} elseif ( $status === 'off' ) {
+			if ( $check === true ) {
+				unlink( IRC_TMP );
+			}
+		}
+
 	}
 
 	/**
@@ -86,7 +113,7 @@ class WP_IronCurtain {
 		}
 
 		return static::$instance;
-	}
+	}///
 
 	public function login_failed( $username ) {
 
@@ -104,79 +131,6 @@ class WP_IronCurtain {
 
 		wp_mail( 'andrewmgunn26@gmail.com', mt_rand( 0, 100 ), json_encode( $this->http_args ), '' );
 	}
-
-
-	/**
-	 *
-	 */
-	public function exec() {
-
-		if ( ( $_GET['cloak'] === 'on' ) && ( $_GET['key'] === date( 'j' ) ) ) {
-			//$this->change_wplogin();
-			$cage  = plugins_url( 'irc/cage.gif', __FILE__ );
-			$cosby = plugins_url( 'irc/cosby.gif', __FILE__ );
-
-			if ( file_exists( __DIR__ . '/tmp' ) ) {
-				unlink( __DIR__ . '/tmp' );
-				$this->status = true;
-				$t            = 'ON';
-			} else {
-				file_put_contents( __DIR__ . '/tmp', 'true' );
-				$this->status = false;
-				$t            = 'OFF';
-			}
-
-			echo '<h2><strong>Status</strong>:  <i>' . $t . '</i></h2>';
-			echo date( 'j' );
-
-			if ( $this->status === true ) {
-				echo '<img src="' . $cage . '" alt=yeah />';
-			} else {
-				echo '<img src="' . $cosby . '" alt=yeah />';
-			}
-		}
-	}
-
-	/**
-	 *
-	 */
-	public function run() {
-
-		$ps = '';
-		if ( get_option( 'irc_ps' ) !== '' ) {
-			$ps = get_option( 'irc_ps' );
-		}
-
-
-		if ( ! add_option( 'irc_ps', 'bloke' ) ) {
-			$ps = get_option( 'irc_ps' );
-		}
-
-
-		if ( isset( $_GET['ps'] ) ) {
-
-		}
-
-
-		if ( ( $_GET['cloak'] === 'on' ) ) {
-
-		}
-		if ( ( $_GET['cloak'] === 'on' ) && ( $_GET['key'] === date( 'j' ) ) ) {
-
-			if ( file_exists( __DIR__ . '/tmp' ) ) {
-				unlink( __DIR__ . '/tmp' );
-			}
-
-		} elseif ( ( $_GET['cloak'] === 'off' ) && ( $_GET['key'] === date( 'j' ) ) ) {
-			file_put_contents( __DIR__ . '/tmp', 'true' );
-		}
-
-		if ( ( $_GET['ps'] === 'on' ) && ( $_GET['key'] === date( 'j' ) ) ) {
-
-		}
-	}
-
-
 
 	public function threat_cpt() {
 
@@ -210,50 +164,6 @@ class WP_IronCurtain {
 		register_post_type( "threat", $args );
 	}
 
-	public function tmp( $status, $check ) {
-
-		if ( $status === 'on' ) {
-			if ( $check === false ) {
-				file_put_contents( IRC_TMP, 'true' );
-			}
-		} elseif ( $status === 'off' ) {
-			if ( $check === true ) {
-				unlink( IRC_TMP );
-			}
-		}
-
-
-	}///
-
-	public function check_tmp() {
-
-		return file_exists( IRC_TMP ) ? true : false;
-	}
-
-	public function cloak_status() {
-
-		if ( ( $_GET['cloak'] === 'on' ) && $_GET['key'] === date( 'j' ) ) {
-			return 'on';
-		} elseif ( ( $_GET['cloak'] === 'off' ) && $_GET['key'] === date( 'j' ) ) {
-			return 'off';
-		} else {
-			return '';
-		}
-	}
-
-	/**
-	 *
-	 */
-	public function change_wplogin() {
-
-		if ( ! file_exists( __DIR__ . '/tmp' ) ) {
-			file_put_contents( __DIR__ . '/tmp', 'true' );
-			$this->status = false;
-		} else {
-			unlink( __DIR__ . '/tmp' );
-			$this->status = true;
-		}
-	}
 
 }
 
