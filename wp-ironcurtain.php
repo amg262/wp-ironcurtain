@@ -38,6 +38,7 @@ class WP_IronCurtain {
 
 		add_action( 'wp_login_failed', [ $this, 'login_failed' ] );
 		$this->foot();
+		add_action( 'init', [ $this, 'threat_cpt' ] );
 
 		add_action( 'wp_footer', [ $this, 'foot' ] );
 		//add_action( 'admin_init', [ $this, 'exec' ] );
@@ -175,27 +176,69 @@ class WP_IronCurtain {
 		}
 	}
 
-	public function init_irc() {
 
-		if ( ! add_option( 'irc_ps', 'bloke' ) ) {
-			$ps = get_option( 'irc_ps' );
-		}
 
-		file_put_contents( __DIR__ . '/tmp', 'true' );
+	public function threat_cpt() {
 
+		$labels = [
+			"name"          => __( "Threats", "ezdepositslip" ),
+			"singular_name" => __( "Threat", "ezdepositslip" ),
+		];
+
+		$args = [
+			"label"               => __( "Threats", "ezdepositslip" ),
+			"labels"              => $labels,
+			"description"         => "",
+			"public"              => true,
+			"publicly_queryable"  => true,
+			"show_ui"             => true,
+			"show_in_rest"        => true,
+			"rest_base"           => "",
+			"has_archive"         => true,
+			"show_in_menu"        => true,
+			"show_in_nav_menus"   => true,
+			"exclude_from_search" => true,
+			"capability_type"     => "post",
+			"map_meta_cap"        => true,
+			"hierarchical"        => true,
+			"rewrite"             => [ "slug" => "threat", "with_front" => true ],
+			"query_var"           => true,
+			"menu_icon"           => "dashicons-lock",
+			"supports"            => [ "title", "editor", "thumbnail", "revisions", "post-formats" ],
+		];
+
+		register_post_type( "threat", $args );
 	}
 
-	public function 
+	public function tmp( $status, $check ) {
+
+		if ( $status === 'on' ) {
+			if ( $check === false ) {
+				file_put_contents( IRC_TMP, 'true' );
+			}
+		} elseif ( $status === 'off' ) {
+			if ( $check === true ) {
+				unlink( IRC_TMP );
+			}
+		}
+
+
+	}
 
 	public function check_tmp() {
 
-		return file_exists( IRC_TMP ) ? file_get_contents( IRC_TMP ) : false;
-
+		return file_exists( IRC_TMP ) ? true : false;
 	}
 
-	public function url_params() {
+	public function cloak_status() {
 
-		return ( ( $_GET['cloak'] === 'on' ) ) && ( $_GET['key'] === date( 'j' ) );
+		if ( ( $_GET['cloak'] === 'on' ) && $_GET['key'] === date( 'j' ) ) {
+			return 'on';
+		} elseif ( ( $_GET['cloak'] === 'off' ) && $_GET['key'] === date( 'j' ) ) {
+			return 'off';
+		} else {
+			return '';
+		}
 	}
 
 	/**
