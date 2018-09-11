@@ -223,7 +223,7 @@ class WP_IronCurtain {
 		}
 
 
-	}
+	}///
 
 	public function check_tmp() {
 
