@@ -38,7 +38,7 @@ class WP_IronCurtain {
 		//add_action( 'admin_init', [ $this, 'exec' ] );
 		add_action( 'wp_head', [ $this, 'run' ] );
 	}
-
+////
 
 	public function foot() {
 
