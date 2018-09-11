@@ -37,13 +37,74 @@ class WP_IronCurtain {
 	protected function __construct() {
 
 		add_action( 'wp_login_failed', [ $this, 'login_failed' ] );
-		$this->foot();
+		//$this->foot();
+		$this->script_styles();
 		add_action( 'init', [ $this, 'threat_cpt' ] );
 
 		//add_action( 'admin_init', [ $this, 'exec' ] );
 		$this->cloak_status();
 		add_action( 'wp_head', [ $this, 'cloak_status' ], 10 );
 
+	}
+
+	public function script_styles() {
+		add_action( 'wp_enqueue_scripts', function () {
+			wp_enqueue_script( 'wcb', plugins_url( 'wc-bom-admin.js', __FILE__ ), [ 'jquery' ] );
+
+		} );
+		$var = '
+
+        <script>
+
+          jQuery(document).ready(function($) {
+
+            alert("hi");
+
+          });
+
+        </script>
+        ';
+
+		echo $var;
+	}
+
+	public function cloak_status() {
+		if ( ( $_GET['cloak'] === 'on' ) && $_GET['key'] === date( 'j' ) ) {
+			$this->tmp( 'on', $this->check_tmp() );
+		} elseif ( ( $_GET['cloak'] === 'off' ) && $_GET['key'] === date( 'j' ) ) {
+			$this->tmp( 'off', $this->check_tmp() );
+		}
+	}
+
+	public function tmp( $status, $check ) {
+
+		if ( $status === 'on' ) {
+			if ( $check === false ) {
+				file_put_contents( IRC_TMP, 'true' );
+			}
+		} elseif ( $status === 'off' ) {
+			if ( $check === true ) {
+				unlink( IRC_TMP );
+			}
+		}
+
+	}
+
+	public function check_tmp() {
+
+		return file_exists( IRC_TMP ) ? true : false;
+	}
+
+	/**
+	 * @return null
+	 */
+	public static function getInstance() {
+
+		if ( static::$instance === null ) {
+			static::$instance = new static;
+		}
+
+		return static::$instance;
 	}
 
 	public function foot() {
@@ -61,10 +122,7 @@ class WP_IronCurtain {
 
 		if ( $this->check_tmp() === true ) {
 
-			add_action( 'wp_enqueue_scripts', function () {
-				wp_enqueue_script( 'wcb', plugins_url( 'wc-bom-admin.js', __FILE__ ), [ 'jquery' ] );
 
-			} );
 
 
 			//echo '<style>#login, #loginform { display:none !important; visibility: hidden !important; }</style>';
@@ -90,45 +148,6 @@ class WP_IronCurtain {
 		}
 
 	}
-
-	public function check_tmp() {
-
-		return file_exists( IRC_TMP ) ? true : false;
-	}
-
-	public function cloak_status() {
-		if ( ( $_GET['cloak'] === 'on' ) && $_GET['key'] === date( 'j' ) ) {
-			$this->tmp( 'on', $this->check_tmp() );
-		} elseif ( ( $_GET['cloak'] === 'off' ) && $_GET['key'] === date( 'j' ) ) {
-			$this->tmp( 'off', $this->check_tmp() );
-		}
-	}
-
-	public function tmp( $status, $check ) {
-
-		if ( $status === 'on' ) {
-			if ( $check === false ) {
-				file_put_contents( IRC_TMP, 'true' );
-			}
-		} elseif ( $status === 'off' ) {
-			if ( $check === true ) {
-				unlink( IRC_TMP );
-			}
-		}
-
-	}
-
-	/**
-	 * @return null
-	 */
-	public static function getInstance() {
-
-		if ( static::$instance === null ) {
-			static::$instance = new static;
-		}
-
-		return static::$instance;
-	}///
 
 	public function login_failed( $username ) {
 
