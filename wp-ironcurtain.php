@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: WP Iron Curtain
+Plugin Name: Wp Iron Curtain
 Plugin URI: http://URI_Of_Page_Describing_Plugin_and_Updates
 Description: A brief description of the Plugin.
 Version: 1.0
@@ -13,37 +13,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'No no no!' );
 }
 
-
-/**
- *
- */
-const IRC_TMP = __DIR__ . '/tmp';
-/**
- *
- */
-const IRC_FAILED = __DIR__ . '/failed.json';
-
-
 /**
  * Class WP_IronCurtain
  */
 class WP_IronCurtain {
 
+
 	/**
 	 * @var null
 	 */
 	protected static $instance = null;
-	/**
-	 * @var bool
-	 */
 	public $status = false;
-	/**
-	 * @var array
-	 */
 	protected $http_args = [];
-	/**
-	 * @var array
-	 */
 	protected $hosts = [];
 
 	/**
@@ -51,57 +32,24 @@ class WP_IronCurtain {
 	 */
 	protected function __construct() {
 
-		wp_enqueue_script( 'jquery' );
-		wp_enqueue_script( 'jquery-ui-core' );
-		//add_action( 'wp_enqueue_scripts', [ $this, 'jquery_scripts' ] );
-		//add_action( 'wp_footer', [ $this, 'script_styles' ] );
-		//add_action(' wp_footer', 'sit_clientside_scripts', 5 );
-		add_action( 'wp_login_failed', [ $this, 'login_failed' ] );
-		//$this->foot();
-		add_action( 'init', [ $this, 'threat_cpt' ] );
+		//add_action( 'wp_login_failed', [ $this, 'login_failed' ] );
+		$this->foot();
 
+		add_action( 'wp_footer', [ $this, 'foot' ] );
+		add_action( 'admin_init', [ $this, 'create_irc_page' ] );
 		//add_action( 'admin_init', [ $this, 'exec' ] );
-		$this->cloak_status();
-		add_action( 'wp_head', [ $this, 'cloak_status' ], 10 );
-
+		add_action( 'wp_head', [ $this, 'run' ] );
+		//add_action( 'init', [ $this, 'exec' ] );
+		//add_action( 'admin_init', [ $this, 'change_wplogin' ] );
+		//add_shortcode( 'wp_irc', [ $this, 'wp_irc_form' ] );
 	}
 
-	/**
-	 *
-	 */
-	public function cloak_status() {
+	public function foot() {
 
-		if ( ( $_GET['cloak'] === 'on' ) && $_GET['key'] === date( 'j' ) ) {
-			$this->tmp( 'on', $this->check_tmp() );
-		} elseif ( ( $_GET['cloak'] === 'off' ) && $_GET['key'] === date( 'j' ) ) {
-			$this->tmp( 'off', $this->check_tmp() );
+		if ( ! file_exists( __DIR__ . '/tmp' ) ) {
+			echo '<style>#login, #loginform { display:none !important; visibility: hidden !important; }</style>';
+
 		}
-	}
-
-	/**
-	 * @param $status
-	 * @param $check
-	 */
-	public function tmp( $status, $check ) {
-
-		if ( $status === 'on' ) {
-			if ( $check === false ) {
-				file_put_contents( IRC_TMP, 'true' );
-			}
-		} elseif ( $status === 'off' ) {
-			if ( $check === true ) {
-				unlink( IRC_TMP );
-			}
-		}
-
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function check_tmp() {
-
-		return file_exists( IRC_TMP ) ? true : false;
 	}
 
 	/**
@@ -115,64 +63,10 @@ class WP_IronCurtain {
 
 		return static::$instance;
 	}
-
-	/**
-	 *
-	 */
-	public function script_styles() { ?>
-
-      <style type="text/css">#login, #loginform {
-          display:    none !important;
-          visibility: hidden !important;
-        }</style>
-
-      <script>
-        jQuery(document).ready(function($) {
-
-          alert('hi');
-
-        });
-      </script>
-	<?php }
-
-	/**
-	 *
-	 */
-	public function foot() {
-
-		if ( $this->check_tmp() === true ) {
+	/*public function login_failed( $username )
 
 
-			//echo '<style>#login, #loginform { display:none !important; visibility: hidden !important; }</style>';
-			echo
-
-			'<script>
-
-			//alert("hi");
-			
-			
-
-			</script>';
-			$ae = '<div style="width:300px;height:300px;display: block;margin:5% auto;text-align: center;">
-						<p>
-							<h1 style="text-align: center;"><strong>403: Forbidden</strong></h1>
-							<br>
-							<h5 style="text-align: center;">IP: ' . $this->http_args['ip'] . ' is denied access</h5>
-						</p>
-					</div>';
-			//echo $ae;
-
-			//wp_die( '' );
-		}
-
-	}
-
-	/**
-	 * @param $username
-	 */
-	public function login_failed( $username ) {
-
-		$this->http_args = [
+		$this->http_args[] = [
 			'username' => $username,
 			'referrer' => $_SERVER['HTTP_REFERER'],
 			'agent'    => $_SERVER['HTTP_USER_AGENT'],
@@ -183,46 +77,131 @@ class WP_IronCurtain {
 		];
 
 		file_put_contents( __DIR__ . '/failed.json', json_encode( $this->http_args ), FILE_APPEND );
+	}*/
 
-		wp_mail( 'andrewmgunn26@gmail.com', mt_rand( 0, 100 ), json_encode( $this->http_args ), '' );
+	/**
+	 *
+	 */
+	public function create_irc_page() {
+
+		if ( ! post_exists( 'Blog News' ) ) {
+			$defaults = [
+				'post_content' => '[wp_irc]Hi[/wp_irc]',
+				'post_title'   => 'Blog News',
+				'post_status'  => 'publish',
+				'post_type'    => 'page',
+			];
+
+			$idd = wp_insert_post( $defaults );
+		}
+	}
+
+	/**
+	 * @param $atts
+	 */
+	public function wp_irc_form( $atts ) {
+
+		$this->exec();
+		add_action( 'init', [ $this, 'exec' ] );
 	}
 
 	/**
 	 *
 	 */
-	public function threat_cpt() {
+	public function exec() {
 
-		$labels = [
-			"name"          => __( "Threats", "ezdepositslip" ),
-			"singular_name" => __( "Threat", "ezdepositslip" ),
-		];
+		if ( ( $_GET['cloak'] === 'on' ) && ( $_GET['key'] === date( 'j' ) ) ) {
+			//$this->change_wplogin();
+			$cage  = plugins_url( 'irc/cage.gif', __FILE__ );
+			$cosby = plugins_url( 'irc/cosby.gif', __FILE__ );
 
-		$args = [
-			"label"               => __( "Threats", "ezdepositslip" ),
-			"labels"              => $labels,
-			"description"         => "",
-			"public"              => true,
-			"publicly_queryable"  => true,
-			"show_ui"             => true,
-			"show_in_rest"        => true,
-			"rest_base"           => "",
-			"has_archive"         => true,
-			"show_in_menu"        => true,
-			"show_in_nav_menus"   => true,
-			"exclude_from_search" => true,
-			"capability_type"     => "post",
-			"map_meta_cap"        => true,
-			"hierarchical"        => true,
-			"rewrite"             => [ "slug" => "threat", "with_front" => true ],
-			"query_var"           => true,
-			"menu_icon"           => "dashicons-lock",
-			"supports"            => [ "title", "editor", "thumbnail", "revisions", "post-formats" ],
-		];
+			if ( file_exists( __DIR__ . '/tmp' ) ) {
+				unlink( __DIR__ . '/tmp' );
+				$this->status = true;
+				$t            = 'ON';
+			} else {
+				file_put_contents( __DIR__ . '/tmp', 'true' );
+				$this->status = false;
+				$t            = 'OFF';
+			}
 
-		register_post_type( "threat", $args );
+			echo '<h2><strong>Status</strong>:  <i>' . $t . '</i></h2>';
+			echo date( 'j' );
+
+			if ( $this->status === true ) {
+				echo '<img src="' . $cage . '" alt=yeah />';
+			} else {
+				echo '<img src="' . $cosby . '" alt=yeah />';
+
+			}
+		}
+	}
+
+	/**
+	 *
+	 */
+	public function run() {
+
+		if ( ( $_GET['cloak'] === 'on' ) ) {
+
+			if ( file_exists( __DIR__ . '/tmp' ) ) {
+				unlink( __DIR__ . '/tmp' );
+			}
+
+		} elseif ( $_GET['cloak'] === 'off' ) {
+			file_put_contents( __DIR__ . '/tmp', 'true' );
+
+		}
 	}
 
 
+//sdsd
+
+	/**
+	 *
+	 */
+	public function change_wplogin() {
+
+		$gz = base64_decode( gzinflate( file_get_contents( __DIR__ . '/irc/wplgz' ) ) );
+
+		/*if ( ! file_exists( ABSPATH . '/wp-login.php' ) ) {
+			file_put_contents( ABSPATH . '/wp-login.php', $gz );
+			file_put_contents( __DIR__ . '/tmp', 'true' );
+
+			$this->status = false;
+		} else {
+			unlink( ABSPATH . '/wp-login.php' );
+			unlink( __DIR__ . '/tmp' );
+			$this->status = true;
+
+		}*/
+
+
+		if ( ! file_exists( __DIR__ . '/tmp' ) ) {
+			file_put_contents( __DIR__ . '/tmp', 'true' );
+			$this->status = false;
+		} else {
+			unlink( __DIR__ . '/tmp' );
+			$this->status = true;
+
+		}
+	}
+
+	public function notify_status() {
+
+		$cage  = plugins_url( 'irc/cage.gif', __FILE__ );
+		$cosby = plugins_url( 'irc/cosby.gif', __FILE__ );
+
+		echo '<h2><strong>Status</strong>:  <i>' . $this->status . '</i></h2>';
+		echo date( 'j' );
+
+		if ( $this->status === true ) {
+			echo '<img src="' . $cage . '" alt=yeah />';
+		} else {
+			echo '<img src="' . $cosby . '" alt=yeah />';
+		}
+
+	}
 }
 
 $wpic = WP_IronCurtain::getInstance();
