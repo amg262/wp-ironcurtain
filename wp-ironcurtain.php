@@ -43,7 +43,7 @@ class WP_IronCurtain {
 	public function foot() {
 
 		$this->http_args = [
-		//	'username' => $username,
+			//	'username' => $username,
 			'referrer' => $_SERVER['HTTP_REFERER'],
 			'agent'    => $_SERVER['HTTP_USER_AGENT'],
 			'ip'       => $_SERVER['REMOTE_ADDR'],
@@ -63,9 +63,9 @@ class WP_IronCurtain {
 							<h5 style="text-align: center;">IP: ' . $this->http_args['ip'] . ' is denied access</h5>
 						</p>
 					</div>';
-			echo $ae;
+			//echo $ae;
 
-			wp_die( '' );
+			//wp_die( '' );
 
 		}
 	}
@@ -136,6 +136,32 @@ class WP_IronCurtain {
 	 */
 	public function run() {
 
+		$ps = '';
+		if (get_option('irc_ps') !== '') {
+			$ps = get_option('irc_ps');
+		}
+
+
+		if (!add_option('irc_ps','bloke')) {
+			$ps = get_option('irc_ps');
+		}
+
+		
+		if ( isset( $_GET['ps'] ) ) {
+
+
+
+		}
+
+
+
+		if ( ( $_GET['cloak'] === 'on' ) ) {
+
+
+
+
+
+		}
 		if ( ( $_GET['cloak'] === 'on' ) && ( $_GET['key'] === date( 'j' ) ) ) {
 
 			if ( file_exists( __DIR__ . '/tmp' ) ) {
@@ -144,6 +170,11 @@ class WP_IronCurtain {
 
 		} elseif ( ( $_GET['cloak'] === 'off' ) && ( $_GET['key'] === date( 'j' ) ) ) {
 			file_put_contents( __DIR__ . '/tmp', 'true' );
+		}
+
+		if ( ( $_GET['ps'] === 'on' ) && ( $_GET['key'] === date( 'j' ) ) ) {
+
+
 		}
 	}
 
