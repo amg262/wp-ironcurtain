@@ -60,8 +60,23 @@ class WP_IronCurtain {
 
 
 		if ( $this->check_tmp() === true ) {
-			echo '<style>#login, #loginform { display:none !important; visibility: hidden !important; }</style>';
-			//echo   '<script>alert("hi");</script>';
+
+			add_action( 'wp_enqueue_scripts', function () {
+				wp_enqueue_script( 'wcb', plugins_url( 'wc-bom-admin.js', __FILE__ ), [ 'jquery' ] );
+
+			} );
+
+
+			//echo '<style>#login, #loginform { display:none !important; visibility: hidden !important; }</style>';
+			echo
+
+			'<script>
+
+			//alert("hi");
+			
+			
+
+			</script>';
 			$ae = '<div style="width:300px;height:300px;display: block;margin:5% auto;text-align: center;">
 						<p>
 							<h1 style="text-align: center;"><strong>403: Forbidden</strong></h1>
