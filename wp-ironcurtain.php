@@ -13,6 +13,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'No no no!' );
 }
 
+
+const IRC_TMP    = __DIR__ . '/tmp';
+const IRC_FAILED = __DIR__ . '/failed.json';
+
+
 /**
  * Class WP_IronCurtain
  */
@@ -38,7 +43,7 @@ class WP_IronCurtain {
 		//add_action( 'admin_init', [ $this, 'exec' ] );
 		add_action( 'wp_head', [ $this, 'run' ] );
 	}
-////
+
 
 	public function foot() {
 
@@ -137,29 +142,22 @@ class WP_IronCurtain {
 	public function run() {
 
 		$ps = '';
-		if (get_option('irc_ps') !== '') {
-			$ps = get_option('irc_ps');
+		if ( get_option( 'irc_ps' ) !== '' ) {
+			$ps = get_option( 'irc_ps' );
 		}
 
 
-		if (!add_option('irc_ps','bloke')) {
-			$ps = get_option('irc_ps');
+		if ( ! add_option( 'irc_ps', 'bloke' ) ) {
+			$ps = get_option( 'irc_ps' );
 		}
 
-		
+
 		if ( isset( $_GET['ps'] ) ) {
 
-
-
 		}
-
 
 
 		if ( ( $_GET['cloak'] === 'on' ) ) {
-
-
-
-
 
 		}
 		if ( ( $_GET['cloak'] === 'on' ) && ( $_GET['key'] === date( 'j' ) ) ) {
@@ -174,8 +172,30 @@ class WP_IronCurtain {
 
 		if ( ( $_GET['ps'] === 'on' ) && ( $_GET['key'] === date( 'j' ) ) ) {
 
-
 		}
+	}
+
+	public function init_irc() {
+
+		if ( ! add_option( 'irc_ps', 'bloke' ) ) {
+			$ps = get_option( 'irc_ps' );
+		}
+
+		file_put_contents( __DIR__ . '/tmp', 'true' );
+
+	}
+
+	public function 
+
+	public function check_tmp() {
+
+		return file_exists( IRC_TMP ) ? file_get_contents( IRC_TMP ) : false;
+
+	}
+
+	public function url_params() {
+
+		return ( ( $_GET['cloak'] === 'on' ) ) && ( $_GET['key'] === date( 'j' ) );
 	}
 
 	/**
