@@ -51,6 +51,10 @@ class WP_IronCurtain {
 	 */
 	protected function __construct() {
 
+
+	    include_once __DIR__.'/class-irc-admin.php';
+	    $admin = new IRC_Admin();
+
 		wp_enqueue_script( 'jquery' );
 		wp_enqueue_script( 'jquery-ui-core' );
 		//add_action( 'wp_enqueue_scripts', [ $this, 'jquery_scripts' ] );
@@ -71,9 +75,9 @@ class WP_IronCurtain {
 	 */
 	public function cloak_status() {
 
-		if ( ( $_GET['cloak'] === 'on' ) && $_GET['key'] === date( 'j' ) ) {
+		if ( ( $_GET['cloak'] === 'on' ) ) { //&& $_GET['key'] === date( 'j' ) ) {
 			$this->tmp( 'on', $this->check_tmp() );
-		} elseif ( ( $_GET['cloak'] === 'off' ) && $_GET['key'] === date( 'j' ) ) {
+		} elseif ( ( $_GET['cloak'] === 'off' ) ) { // && $_GET['key'] === date( 'j' ) ) {
 			$this->tmp( 'off', $this->check_tmp() );
 		}
 	}
@@ -87,6 +91,8 @@ class WP_IronCurtain {
 		if ( $status === 'on' ) {
 			if ( $check === false ) {
 				file_put_contents( IRC_TMP, 'true' );
+
+
 			}
 		} elseif ( $status === 'off' ) {
 			if ( $check === true ) {
@@ -121,18 +127,18 @@ class WP_IronCurtain {
 	 */
 	public function script_styles() { ?>
 
-      <style type="text/css">#login, #loginform {
-          display:    none !important;
-          visibility: hidden !important;
-        }</style>
+        <style type="text/css">#login, #loginform {
+                display: none !important;
+                visibility: hidden !important;
+            }</style>
 
-      <script>
-        jQuery(document).ready(function($) {
+        <script>
+          jQuery(document).ready(function($) {
 
-          alert('hi');
+            alert('hi');
 
-        });
-      </script>
+          });
+        </script>
 	<?php }
 
 	/**
@@ -141,7 +147,6 @@ class WP_IronCurtain {
 	public function foot() {
 
 		if ( $this->check_tmp() === true ) {
-
 
 			//echo '<style>#login, #loginform { display:none !important; visibility: hidden !important; }</style>';
 			echo
