@@ -51,9 +51,14 @@ class WP_IronCurtain {
 	 */
 	protected function __construct() {
 
+		include_once __DIR__ . '/class-irc-admin.php';
+		require __DIR__ . '/vendor/autoload.php';
+		require __DIR__.'/class.settings-api.php';
+		require __DIR__.'/oop-example.php';
 
-	    include_once __DIR__.'/class-irc-admin.php';
-	    $admin = new IRC_Admin();
+		$a = new WeDevs_Settings_API_Test();
+		//$d = new WeDevs_Settings_API()
+		$admin = new IRC_Admin();
 
 		wp_enqueue_script( 'jquery' );
 		wp_enqueue_script( 'jquery-ui-core' );
@@ -91,7 +96,6 @@ class WP_IronCurtain {
 		if ( $status === 'on' ) {
 			if ( $check === false ) {
 				file_put_contents( IRC_TMP, 'true' );
-
 
 			}
 		} elseif ( $status === 'off' ) {

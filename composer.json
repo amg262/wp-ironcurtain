@@ -1,0 +1,12 @@
+{
+    "name": "andy/wp-ironcurtain",
+    "require": {
+        "tareq1988/wordpress-settings-api-class": "^1.2"
+    },
+    "authors": [
+        {
+            "name": "Andrew Gunn",
+            "email": "andrewmgunn26@gmail.com"
+        }
+    ]
+}
