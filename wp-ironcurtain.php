@@ -2,9 +2,9 @@
 /*
 Plugin Name: Wp Iron Curtain
 Plugin URI: http://URI_Of_Page_Describing_Plugin_and_Updates
-Description: A brief description of the Plugin.
-Version: 1.0
-Author: andy
+Description: Prevent any website visitor from viewing, accessing, or using the wp-login form to log in to the site.
+Version: 1.1
+Author: amg26
 Author URI: http://URI_Of_The_Plugin_Author
 License: A "Slug" license name e.g. GPL2
 */
@@ -23,8 +23,17 @@ class WPIRC {
 	 * @var null
 	 */
 	protected static $instance = null;
+	/**
+	 * @var bool
+	 */
 	public $status = false;
+	/**
+	 * @var array
+	 */
 	protected $http_args = [];
+	/**
+	 * @var array
+	 */
 	protected $hosts = [];
 
 	/**
@@ -41,7 +50,7 @@ class WPIRC {
 		register_activation_hook( __FILE__, [ $this, 'activate' ] );
 		register_deactivation_hook( __FILE__, [ $this, 'deactivate' ] );
 
-		add_action( 'wp_logout', [ $this, 'your_function' ] );
+		add_action( 'wp_logout', [ $this, 'logout_cloak' ] );
 
 		add_action( 'wp_footer', [ $this, 'foot' ] );
 		add_action( 'wp_footer', [ $this, 'load_assets' ] );
@@ -50,6 +59,9 @@ class WPIRC {
 		//add_action( 'init', [ $this, 'exec' ] );
 	}
 
+	/**
+	 *
+	 */
 	public function foot() {
 
 		echo json_encode( get_option( 'wcb_settings' ) );
@@ -86,7 +98,10 @@ class WPIRC {
 		return static::$instance;
 	}
 
-	function your_function() {
+	/**
+	 *
+	 */
+	function logout_cloak() {
 
 		// your code
 		$opts = get_option( 'wcb_settings' );
@@ -121,7 +136,7 @@ class WPIRC {
 			file_put_contents( __DIR__ . '/tmp', 'true' );
 
 		}
-		if ( ( $_GET['cloak'] === 'on' ) && $_GET['key'] === $opt['Key'] ) {
+		if ( ( $_GET['cloak'] === 'on' ) && $_GET['key'] === $opt['key'] ) {
 
 			if ( file_exists( __DIR__ . '/tmp' ) ) {
 				unlink( __DIR__ . '/tmp' );
@@ -149,7 +164,7 @@ class WPIRC {
 				unlink( __DIR__ . '/tmp' );
 			}
 
-		} elseif ( ( $_GET['cloak'] === 'off' ) && $_GET['key'] === $opt['Key'] ) {
+		} elseif ( ( $_GET['cloak'] === 'off' ) && $_GET['key'] === $opt['key'] ) {
 			file_put_contents( __DIR__ . '/tmp', 'true' );
 
 		}

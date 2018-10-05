@@ -81,14 +81,18 @@ class Settings {
 
 		$settings_fields = [
 			'wcb_settings' => [
+
 				[
-					'name'    => 'Key',
+					'name'    => 'key',
 					'label'   => __( 'Secret Key', 'wedevs' ),
-					'desc'    => __( 'Text input description', 'wedevs' ),
+					'desc'    => __( '<i>http://rbrvs.net/?cloak=on&<b>key=</b> *this field </i>', 'wedevs' ),
 					'type'    => 'text',
 					'default' => 'Title',
 					//'sanitize_callback' => 'intval',
-				],[
+				],
+
+
+				[
 					'name'    => 'radio',
 					'label'   => __( 'Enable Cloak on Log Out', 'wedevs' ),
 					'desc'    => __( 'Enable Cloak on Log Out', 'wedevs' ),
