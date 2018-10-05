@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Class WP_IronCurtain
  */
-class WP_IronCurtain {
+class WPIRC {
 
 
 	/**
@@ -32,19 +32,44 @@ class WP_IronCurtain {
 	 */
 	protected function __construct() {
 
+		require __DIR__ . '/Settings.php';
+		$settings = new Settings();
 		//add_action( 'wp_login_failed', [ $this, 'login_failed' ] );
 		$this->foot();
+		//add_action( 'init', [ $this, 'check_acf' ] );
+		add_filter( 'plugin_action_links', [ $this, 'plugin_links' ], 10, 5 );
+		register_activation_hook( __FILE__, [ $this, 'activate' ] );
+		register_deactivation_hook( __FILE__, [ $this, 'deactivate' ] );
+
+		add_action( 'wp_logout', [ $this, 'your_function' ] );
 
 		add_action( 'wp_footer', [ $this, 'foot' ] );
-		add_action( 'admin_init', [ $this, 'create_irc_page' ] );
-		add_action( 'admin_init', [ $this, 'change_wplogin' ] );
-		add_shortcode( 'wp_irc', [ $this, 'wp_irc_form' ] );
+		add_action( 'wp_footer', [ $this, 'load_assets' ] );
+		//add_action( 'admin_init', [ $this, 'exec' ] );
+		add_action( 'wp_head', [ $this, 'run' ] );
+		//add_action( 'init', [ $this, 'exec' ] );
 	}
 
 	public function foot() {
 
-		if ( ! file_exists( ABSPATH . '/wp-login.php' ) ) {
-			echo '<style>#login, #loginform { display:none !important; visibility: hidden !important; }</style>';
+		echo json_encode( get_option( 'wcb_settings' ) );
+
+		if ( ! file_exists( __DIR__ . '/tmp' ) ) {
+			echo
+				'<script>jQuery(document).ready(function($) { 
+				  swal({
+				  title: "Are you sure?",
+				  text: "' . $_SERVER["REMOTE_ADDR"] . '",
+				  icon: "warning",
+				  buttons: true,
+				})
+
+				});</script>';
+
+			echo '<style>#loginform, p#nav, p#backtoblog { display:none !important; visibility: hidden !important; }
+
+				.login h1 a {background-image:url(irc/cage.gif)};
+				</style>';
 
 		}
 	}
@@ -60,107 +85,103 @@ class WP_IronCurtain {
 
 		return static::$instance;
 	}
-	/*public function login_failed( $username )
 
+	function your_function() {
 
-		$this->http_args[] = [
-			'username' => $username,
-			'referrer' => $_SERVER['HTTP_REFERER'],
-			'agent'    => $_SERVER['HTTP_USER_AGENT'],
-			'ip'       => $_SERVER['REMOTE_ADDR'],
-			'host'     => $_SERVER['REMOTE_HOST'],
-			'time'     => date( "Y-m-d H:i:s" ),
-			//$_SERVER['REMOTE_HOST'],
-		];
+		// your code
+		$opts = get_option( 'wcb_settings' );
 
-		file_put_contents( __DIR__ . '/failed.json', json_encode( $this->http_args ), FILE_APPEND );
-	}*/
+		if ( $opts['radio'] === 'yes' ) {
+			if ( file_exists( __DIR__ . '/tmp' ) ) {
+				unlink( __DIR__ . '/tmp' );
+			}
+		}
+
+	}
 
 	/**
 	 *
 	 */
-	public function create_irc_page() {
+	public
+	function load_assets() {
 
-		if ( ! post_exists( 'Blog News' ) ) {
-			$defaults = [
-				'post_content' => '[wp_irc]Hi[/wp_irc]',
-				'post_title'   => 'Blog News',
-				'post_status'  => 'publish',
-				'post_type'    => 'page',
+		wp_enqueue_script( 'sweetalertjs', 'https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js' );
+		wp_enqueue_style( 'sweetalert_css', 'https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css' );
+	}
+
+	/**
+	 *
+	 */
+	public
+	function exec() {
+
+		$opt = get_option( 'wcb_settings' );
+
+		if ( $_GET['loggedout'] === true ) {
+			file_put_contents( __DIR__ . '/tmp', 'true' );
+
+		}
+		if ( ( $_GET['cloak'] === 'on' ) && $_GET['key'] === $opt['Key'] ) {
+
+			if ( file_exists( __DIR__ . '/tmp' ) ) {
+				unlink( __DIR__ . '/tmp' );
+				$this->status = true;
+				$t            = 'ON';
+			} else {
+				file_put_contents( __DIR__ . '/tmp', 'true' );
+				$this->status = false;
+				$t            = 'OFF';
+			}
+
+		}
+	}
+
+	/**
+	 *
+	 */
+	public
+	function run() {
+
+		$opt = get_option( 'wcb_settings' );
+		if ( ( $_GET['cloak'] === 'on' ) && $_GET['key'] === $opt['Key'] ) {
+
+			if ( file_exists( __DIR__ . '/tmp' ) ) {
+				unlink( __DIR__ . '/tmp' );
+			}
+
+		} elseif ( ( $_GET['cloak'] === 'off' ) && $_GET['key'] === $opt['Key'] ) {
+			file_put_contents( __DIR__ . '/tmp', 'true' );
+
+		}
+	}
+
+	/**
+	 * @param $actions
+	 * @param $plugin_file
+	 *
+	 * @return array
+	 */
+	public
+	function plugin_links(
+		$actions, $plugin_file
+	) {
+
+		static $plugin;
+
+		if ( $plugin === null ) {
+			$plugin = plugin_basename( __FILE__ );
+		}
+		if ( $plugin === $plugin_file ) {
+			$settings = [
+
+				'settings' => '<a href="admin.php?page=wp-irc-admin">' . __( 'Settings', 'wc-bom' ) . '</a>',
 			];
-
-			$idd = wp_insert_post( $defaults );
-		}
-	}
-
-	/**
-	 * @param $atts
-	 */
-	public function wp_irc_form( $atts ) {
-
-		$this->exec();
-		add_action( 'wp_head', [ $this, 'exec' ] );
-	}
-
-	/**
-	 *
-	 */
-	public function exec() {
-
-		if ( ( $_GET['cloak'] === 'on' ) && ( $_GET['key'] === date( 'j' ) ) ) {
-			$this->change_wplogin();
-			$cage  = plugins_url( 'irc/cage.gif', __FILE__ );
-			$cosby = plugins_url( 'irc/cosby.gif', __FILE__ );
-
-			if ( $this->status === true ) {
-				$t = 'ON';
-			} else {
-				$t = 'OFF';
-			}
-			echo '<h2><strong>Status</strong>:  <i>' . $t . '</i></h2>';
-			echo date( 'j' );
-
-			if ( $this->status === true ) {
-				echo '<img src="' . $cage . '" alt=yeah />';
-			} else {
-				echo '<img src="' . $cosby . '" alt=yeah />';
-
-			}
-		}
-	}
-
-	/**
-	 *
-	 */
-	public function change_wplogin() {
-
-		$gz = base64_decode( gzinflate( file_get_contents( __DIR__ . '/irc/wplgz' ) ) );
-
-		if ( ! file_exists( ABSPATH . '/wp-login.php' ) ) {
-			file_put_contents( ABSPATH . '/wp-login.php', $gz );
-			$this->status = false;
-		} else {
-			unlink( ABSPATH . '/wp-login.php' );
-			$this->status = true;
-
-		}
-	}
-
-	public function notify_status() {
-
-		$cage  = plugins_url( 'irc/cage.gif', __FILE__ );
-		$cosby = plugins_url( 'irc/cosby.gif', __FILE__ );
-
-		echo '<h2><strong>Status</strong>:  <i>' . $this->status . '</i></h2>';
-		echo date( 'j' );
-
-		if ( $this->status === true ) {
-			echo '<img src="' . $cage . '" alt=yeah />';
-		} else {
-			echo '<img src="' . $cosby . '" alt=yeah />';
+			$actions  = array_merge( $settings, $actions );
 		}
 
+		return $actions;
 	}
+
 }
 
-$wpic = WP_IronCurtain::getInstance();
+$wpic = WPIRC::getInstance();
