@@ -13,6 +13,37 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'No no no!' );
 }
 
+
+$opts = get_option( 'wcb_settings' );
+
+if ( $opts['cloak'] === 'On' ) {
+
+	require __DIR__ . '/wp-irc-login.php';
+	add_action( 'login_form', 'myplugin_add_login_fields' );
+
+}
+
+// Scheduled Action Hook
+function cloak_expire() {
+
+	$opts = get_option( 'wcb_settings' );
+	if ($opts['event']) {
+
+	}
+	if ($opts['expire']) {
+
+	}
+}
+
+// Schedule Cron Job Event
+function cloak_expire_check() {
+	if ( ! wp_next_scheduled( 'cloak_expire' ) ) {
+		wp_schedule_event( current_time( 'timestamp' ), 'daily', 'cloak_expire' );
+	}
+}
+
+add_action( 'wp', 'cloak_expire_check' );
+
 /**
  * Class WP_IronCurtain
  */
@@ -56,6 +87,9 @@ class WPIRC {
 		add_action( 'wp_footer', [ $this, 'load_assets' ] );
 		//add_action( 'admin_init', [ $this, 'exec' ] );
 		add_action( 'wp_head', [ $this, 'run' ] );
+
+		add_action( 'login_form', 'myplugin_add_login_fields' );
+
 		//add_action( 'init', [ $this, 'exec' ] );
 	}
 
@@ -64,7 +98,7 @@ class WPIRC {
 	 */
 	public function foot() {
 
-		echo json_encode( get_option( 'wcb_settings' ) );
+		//echo //json_encode( get_option( 'wcb_settings' ) );
 
 		if ( ! file_exists( __DIR__ . '/tmp' ) ) {
 			echo
@@ -97,6 +131,7 @@ class WPIRC {
 
 		return static::$instance;
 	}
+
 
 	/**
 	 *
@@ -131,6 +166,14 @@ class WPIRC {
 	function exec() {
 
 		$opt = get_option( 'wcb_settings' );
+		if ( ( $_GET['cloak'] === 'status' ) ) {
+			if ( file_exists( __DIR__ . '/tmp' ) ) {
+				echo '<h1>CLOAK IS <strong>OFF</strong></h1>';
+			} else {
+				echo '<h1>CLOAK IS <strong>ON</strong></h1>';
+
+			}
+		}
 
 		if ( $_GET['loggedout'] === true ) {
 			file_put_contents( __DIR__ . '/tmp', 'true' );
@@ -158,6 +201,8 @@ class WPIRC {
 	function run() {
 
 		$opt = get_option( 'wcb_settings' );
+
+
 		if ( ( $_GET['cloak'] === 'on' ) && $_GET['key'] === $opt['Key'] ) {
 
 			if ( file_exists( __DIR__ . '/tmp' ) ) {

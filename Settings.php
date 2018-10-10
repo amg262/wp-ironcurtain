@@ -37,11 +37,11 @@ class Settings {
 		$sections = [
 			[
 				'id'    => 'wcb_settings',
-				'title' => __( 'Basic Settings', 'wedevs' ),
+				'title' => __( 'Cloak ', 'wedevs' ),
 			],
 			[
-				'id'    => 'wcb_advanced',
-				'title' => __( 'Advanced Settings', 'wedevs' ),
+				'id'    => 'wcb_login',
+				'title' => __( 'Login Page', 'wedevs' ),
 			],
 			[
 				'id'    => 'wcb_others',
@@ -59,10 +59,6 @@ class Settings {
 	 */
 	function get_settings_fields() {
 
-		foreach ( get_post_types() as $type ) {
-
-			//echo json_encode( $type );
-		}
 
 		$args = [
 			'posts_per_page'   => - 1,
@@ -79,9 +75,37 @@ class Settings {
 		}
 
 
+		$day  = date( 'd' );
+		$ints = (int) $day;
+
+		$arr = [ $ints, $ints + 1, $ints + 2, $ints + 3 ];
+
+
+		echo json_encode($arr);
 		$settings_fields = [
 			'wcb_settings' => [
-
+				[
+					'name'    => 'build',
+					'label'   => __( 'WP Iron Curtain', 'wedevs' ),
+					'desc'    => __( 'Build version to use', 'wedevs' ),
+					'type'    => 'select',
+					'default' => '2.0',
+					'options' => [
+						'1.0' => '1.0',
+						'2.0' => '2.0',
+					],
+				],
+				[
+					'name'    => 'cloak',
+					'label'   => __( 'Cloak Status', 'wedevs' ),
+					'desc'    => __( 'Cloak', 'wedevs' ),
+					'type'    => 'radio',
+					'default' => 'On',
+					'options' => [
+						'On'  => 'On',
+						'Off' => 'Off',
+					],
+				],
 				[
 					'name'    => 'key',
 					'label'   => __( 'Secret Key', 'wedevs' ),
@@ -93,16 +117,69 @@ class Settings {
 
 
 				[
-					'name'    => 'radio',
-					'label'   => __( 'Enable Cloak on Log Out', 'wedevs' ),
-					'desc'    => __( 'Enable Cloak on Log Out', 'wedevs' ),
+					'name'    => 'logout',
+					'label'   => __( 'Logout Action', 'wedevs' ),
+					'desc'    => __( 'Enable cloak on logout', 'wedevs' ),
 					'type'    => 'radio',
 					'options' => [
 						'yes' => 'Yes',
 						'no'  => 'No',
 					],
 				],
-			]
+				[
+					'name'    => 'expire',
+					'label'   => __( 'Cloak Expire', 'wedevs' ),
+					'desc'    => __( 't', 'wedevs' ),
+					'type'    => 'radio',
+					'options' => [
+						'Logout'    => 'Logout',
+						'Day'       => 'Day',
+						'No Expire' => 'None',
+					],
+				],
+				[
+					'name'    => 'expire',
+					'label'   => __( 'Cloak Expire', 'wedevs' ),
+					'desc'    => __( 't', 'wedevs' ),
+					'type'    => 'radio',
+					'options' => [
+						'Logout' => date( 'd' ),
+					],
+				],
+
+			],
+			'wcb_login'    => [
+				[
+					'name'    => 'body',
+					'label'   => __( 'Body', 'wedevs' ),
+					'desc'    => __( 'Background Color', 'wedevs' ),
+					'type'    => 'color',
+					'default' => '#f1f1f1',
+				],
+				[
+					'name'    => 'login',
+					'label'   => __( 'Login Form', 'wedevs' ),
+					'desc'    => __( 'Background Color', 'wedevs' ),
+					'type'    => 'color',
+					'default' => '#fff',
+				],
+				[
+					'name'    => 'css',
+					'label'   => __( 'CSS', 'wedevs' ),
+					'desc'    => __( 'CSS styles inserted between <style>  </style> on login error page', 'wedevs' ),
+					'type'    => 'wysiwyg',
+					'default' => '',
+				],
+				[
+					'name'    => 'html',
+					'label'   => __( 'HTML', 'wedevs' ),
+					'desc'    => __( 'HTML displayed on login Error page', 'wedevs' ),
+					'type'    => 'wysiwyg',
+					'default' => '',
+				],
+			],
+
+		];
 //				[
 //					'name'              => 'number_input',
 //					'label'             => __( 'Number Input', 'wedevs' ),
@@ -132,19 +209,7 @@ class Settings {
 //						'yes' => 'Yes',
 //						'no'  => 'No',
 //					],
-//				],
-//				[
-//					'name'    => 'multicheck',
-//					'label'   => __( 'Multile checkbox', 'wedevs' ),
-//					'desc'    => __( 'Multi checkbox description', 'wedevs' ),
-//					'type'    => 'multicheck',
-//					'options' => [
-//						'one'   => 'One',
-//						'two'   => 'Two',
-//						'three' => 'Three',
-//						'four'  => 'Four',
-//					],
-//				],
+
 //				[
 //					'name'    => 'selectbox',
 //					'label'   => __( 'A Dropdown', 'wedevs' ),
@@ -175,7 +240,6 @@ class Settings {
 //					],
 //				],
 //			],
-//			'wcb_advanced' => [
 //				[
 //					'name'    => 'color',
 //					'label'   => __( 'Color', 'wedevs' ),
@@ -190,13 +254,7 @@ class Settings {
 //					'type'    => 'password',
 //					'default' => '',
 //				],
-//				[
-//					'name'    => 'wysiwyg',
-//					'label'   => __( 'Advanced Editor', 'wedevs' ),
-//					'desc'    => __( 'WP_Editor description', 'wedevs' ),
-//					'type'    => 'wysiwyg',
-//					'default' => '',
-//				],
+
 //				[
 //					'name'    => 'multicheck',
 //					'label'   => __( 'Multile checkbox', 'wedevs' ),
@@ -302,7 +360,7 @@ class Settings {
 //					'default' => '',
 //				],
 //			],
-		];
+
 
 		return $settings_fields;
 	}
