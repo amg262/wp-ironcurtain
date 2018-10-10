@@ -136,6 +136,7 @@ class WPIRC {
 			file_put_contents( __DIR__ . '/tmp', 'true' );
 
 		}
+		
 		if ( ( $_GET['cloak'] === 'on' ) && $_GET['key'] === $opt['key'] ) {
 
 			if ( file_exists( __DIR__ . '/tmp' ) ) {
@@ -158,7 +159,9 @@ class WPIRC {
 	function run() {
 
 		$opt = get_option( 'wcb_settings' );
-		if ( ( $_GET['cloak'] === 'on' ) && $_GET['key'] === $opt['Key'] ) {
+
+
+		if ( ( $_GET['cloak'] === 'on' ) && $_GET['key'] === $opt['key'] ) {
 
 			if ( file_exists( __DIR__ . '/tmp' ) ) {
 				unlink( __DIR__ . '/tmp' );

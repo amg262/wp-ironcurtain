@@ -87,10 +87,17 @@ class Settings {
 					'label'   => __( 'Secret Key', 'wedevs' ),
 					'desc'    => __( '<i>http://rbrvs.net/?cloak=on&<b>key=</b> *this field </i>', 'wedevs' ),
 					'type'    => 'text',
-					'default' => 'Title',
+					'default' => 'stalin',
 					//'sanitize_callback' => 'intval',
 				],
-
+				[
+					'name'    => 'date',
+					'label'   => __( 'Bypass until Day', 'wedevs' ),
+					'desc'    => __( '', 'wedevs' ),
+					'type'    => 'number',
+					'default' => date( 'd' ),
+					//'sanitize_callback' => 'intval',
+				],
 
 				[
 					'name'    => 'radio',
@@ -101,6 +108,20 @@ class Settings {
 						'yes' => 'Yes',
 						'no'  => 'No',
 					],
+				],
+				[
+					'name'    => 'wysiwyg',
+					'label'   => __( 'Advanced Editor', 'wedevs' ),
+					'desc'    => __( 'WP_Editor description', 'wedevs' ),
+					'type'    => 'wysiwyg',
+					'default' => '',
+				],
+				[
+					'name'    => 'wysiwyg',
+					'label'   => __( 'Advanced Editor', 'wedevs' ),
+					'desc'    => __( 'WP_Editor description', 'wedevs' ),
+					'type'    => 'wysiwyg',
+					'default' => '',
 				],
 			]
 //				[
