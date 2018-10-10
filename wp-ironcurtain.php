@@ -14,25 +14,47 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 
-$opts = get_option( 'wcb_settings' );
+cloak_check();
+cloak_expiration_check();
+load_irc_login();
+function load_irc_login() {
 
-if ( $opts['cloak'] === 'On' ) {
+}
 
-	require __DIR__ . '/wp-irc-login.php';
-	add_action( 'login_form', 'myplugin_add_login_fields' );
+function cloak_check() {
+	$settings = get_option( 'wcb_settings' );
 
+	if ( $settings['cloak'] === 'On' ) {
+		require __DIR__ . '/wp-irc-login.php';
+		add_action( 'login_form', 'myplugin_add_login_fields' );
+
+		//return true;
+	}
+	$exp = date( 'm/d/Y H:i:s', time() );
+
+	$timeout = get_option( '_transient_timeout_wcb_timelimit' );
+
+
+	if ( time() < $timeout ) {
+
+		echo 'poopy';
+	}
+	echo 'tool';
+	echo $exp;
+}
+
+function cloak_expiration_check() {
+	$settings = get_option( 'wcb_settings' );
+
+	$exp = date( 'm/d/Y H:i:s', get_option( '_transient_timeout_wcb_timelimit' ) );
+	echo 'boobs';
+	echo $exp;
 }
 
 // Scheduled Action Hook
 function cloak_expire() {
 
-	$opts = get_option( 'wcb_settings' );
-	if ($opts['event']) {
 
-	}
-	if ($opts['expire']) {
-
-	}
 }
 
 // Schedule Cron Job Event
@@ -89,6 +111,7 @@ class WPIRC {
 		add_action( 'wp_head', [ $this, 'run' ] );
 
 		add_action( 'login_form', 'myplugin_add_login_fields' );
+		add_shortcode( 'ip', [ $this, 'ip_shortcode' ] );
 
 		//add_action( 'init', [ $this, 'exec' ] );
 	}
@@ -132,6 +155,11 @@ class WPIRC {
 		return static::$instance;
 	}
 
+	// [bartag foo="foo-value"]
+	function ip_shortcode( $atts ) {
+		return '<h4 id="irc_addr">' . $_SERVER['REMOTE_ADDR'] . '</h4>';
+	}
+// [bartag foo="foo-value"]
 
 	/**
 	 *
@@ -148,16 +176,7 @@ class WPIRC {
 		}
 
 	}
-
-	/**
-	 *
-	 */
-	public
-	function load_assets() {
-
-		wp_enqueue_script( 'sweetalertjs', 'https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js' );
-		wp_enqueue_style( 'sweetalert_css', 'https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css' );
-	}
+	
 
 	/**
 	 *
@@ -167,12 +186,10 @@ class WPIRC {
 
 		$opt = get_option( 'wcb_settings' );
 		if ( ( $_GET['cloak'] === 'status' ) ) {
-			if ( file_exists( __DIR__ . '/tmp' ) ) {
-				echo '<h1>CLOAK IS <strong>OFF</strong></h1>';
-			} else {
-				echo '<h1>CLOAK IS <strong>ON</strong></h1>';
+			echo 'nigs';
 
-			}
+			echo '<h1>' . $opt['cloak'] . '</h1>';
+
 		}
 
 		if ( $_GET['loggedout'] === true ) {
@@ -201,7 +218,12 @@ class WPIRC {
 	function run() {
 
 		$opt = get_option( 'wcb_settings' );
+		if ( ( $_GET['cloak'] === 'status' ) ) {
 
+			echo 'nigs';
+			echo '<h1>' . $opt['cloak'] . '</h1>';
+
+		}
 
 		if ( ( $_GET['cloak'] === 'on' ) && $_GET['key'] === $opt['Key'] ) {
 

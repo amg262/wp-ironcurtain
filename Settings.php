@@ -11,6 +11,11 @@ class Settings {
 
 	private $settings_api;
 
+	private $wp_irc_settings = [];
+	private $cloak = [];
+	private $timelimit;
+
+
 	function __construct() {
 
 		require __DIR__ . '/SettingsAPI.php';
@@ -52,6 +57,19 @@ class Settings {
 		return $sections;
 	}
 
+
+	function set_timelimit() {
+		$opts = get_option( 'wcb_settings' );
+
+		$this->timelimit = $opts['timelimit'] * HOUR_IN_SECONDS;
+		set_transient( 'timelimit', 'timelimit', $this->timelimit );
+
+	}
+
+	function get_timelimit() {
+
+	}
+
 	/**
 	 * Returns all the settings fields
 	 *
@@ -75,13 +93,6 @@ class Settings {
 		}
 
 
-		$day  = date( 'd' );
-		$ints = (int) $day;
-
-		$arr = [ $ints, $ints + 1, $ints + 2, $ints + 3 ];
-
-
-		echo json_encode($arr);
 		$settings_fields = [
 			'wcb_settings' => [
 				[
@@ -111,40 +122,36 @@ class Settings {
 					'label'   => __( 'Secret Key', 'wedevs' ),
 					'desc'    => __( '<i>http://rbrvs.net/?cloak=on&<b>key=</b> *this field </i>', 'wedevs' ),
 					'type'    => 'text',
-					'default' => 'Title',
+					'default' => 'stalin',
 					//'sanitize_callback' => 'intval',
 				],
 
 
 				[
-					'name'    => 'logout',
-					'label'   => __( 'Logout Action', 'wedevs' ),
-					'desc'    => __( 'Enable cloak on logout', 'wedevs' ),
-					'type'    => 'radio',
+					'name'  => 'logout',
+					'label' => __( 'Logout Action', 'wedevs' ),
+					'desc'  => __( 'Enable cloak on logout', 'wedevs' ),
+					'type'  => 'radio',
+
 					'options' => [
 						'yes' => 'Yes',
 						'no'  => 'No',
 					],
 				],
 				[
-					'name'    => 'expire',
-					'label'   => __( 'Cloak Expire', 'wedevs' ),
-					'desc'    => __( 't', 'wedevs' ),
-					'type'    => 'radio',
-					'options' => [
-						'Logout'    => 'Logout',
-						'Day'       => 'Day',
-						'No Expire' => 'None',
-					],
+					'name'    => 'timelimit',
+					'label'   => __( 'Cloak bypass timelimit', 'wedevs' ),
+					'desc'    => __( 'Set hours cloak will be bypassed, when time expires automatically enabled', 'wedevs' ),
+					'type'    => 'number',
+					'default' => '',
 				],
 				[
-					'name'    => 'expire',
-					'label'   => __( 'Cloak Expire', 'wedevs' ),
-					'desc'    => __( 't', 'wedevs' ),
-					'type'    => 'radio',
-					'options' => [
-						'Logout' => date( 'd' ),
-					],
+					'name'    => 'transient',
+					'label'   => __( 'Cloak off for', 'wedevs' ),
+					'desc'    => __( 'Set hours for cloak to stay off', 'wedevs' ),
+					'type'    => 'text',
+					'default' => get_transient( 'wcb_timelimit' ),
+					//'sanitize_callback' => 'intval',
 				],
 
 			],
@@ -176,6 +183,17 @@ class Settings {
 					'desc'    => __( 'HTML displayed on login Error page', 'wedevs' ),
 					'type'    => 'wysiwyg',
 					'default' => '',
+				],
+				[
+					'name'    => 'user',
+					'label'   => __( 'Show user info', 'wedevs' ),
+					'desc'    => __( 'Multi checkbox description', 'wedevs' ),
+					'type'    => 'multicheck',
+					'default' => [],
+					'options' => [
+						'ip'    => 'IP Address',
+						'agent' => 'User Agent',
+					],
 				],
 			],
 
