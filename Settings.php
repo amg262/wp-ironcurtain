@@ -30,11 +30,8 @@ class Settings {
 		//set the settings
 		$this->settings_api->set_sections( $this->get_settings_sections() );
 		$this->settings_api->set_fields( $this->get_settings_fields() );
-
 		//initialize settings
 		$this->settings_api->admin_init();
-
-		//var_dump( get_option( 'wedevs_basics' ) );
 	}
 
 	function get_settings_sections() {
@@ -67,7 +64,15 @@ class Settings {
 	}
 
 	function get_timelimit() {
+		$opts = get_option( 'wcb_settings' );
 
+		if ( $opts['cloak'] === 'On' ) {
+			if ( file_exists( __DIR__ . '/tmp' ) ) {
+				unlink( __DIR__ . '/tmp' );
+			}
+		} else {
+			file_put_contents( __DIR__ . '/tmp', 'true' );
+		}
 	}
 
 	/**
@@ -76,22 +81,6 @@ class Settings {
 	 * @return array settings fields
 	 */
 	function get_settings_fields() {
-
-
-		$args = [
-			'posts_per_page'   => - 1,
-			'post_type'        => 'part',
-			'post_status'      => 'publish',
-			'suppress_filters' => true,
-		];
-
-		$posts_array = get_posts( $args );
-
-		foreach ( $posts_array as $post ) {
-			$post  = new WP_Post( $post );
-			$arr[] = [ $post->post_title => $post->post_title ];
-		}
-
 
 		$settings_fields = [
 			'wcb_settings' => [

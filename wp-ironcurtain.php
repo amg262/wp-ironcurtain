@@ -17,8 +17,33 @@ if ( ! defined( 'ABSPATH' ) ) {
 cloak_check();
 cloak_expiration_check();
 load_irc_login();
-function load_irc_login() {
 
+function load_irc_login() {
+	$settings = get_option( 'wcb_settings' );
+
+	if ( file_exists( __DIR__ . '/tmp' ) ) {
+		echo '<p><h1 id="irc">NUM 1</h1></p>';
+
+	}
+
+	if ( get_option( '_transient_timeout_wcb_timelimit' ) - time() > 0 ) {
+		echo '<p><h1 id="irc">NUM 2</h1></p>';
+
+	}
+
+	if ( get_transient( 'wcb_timelimit' ) ) {
+		echo '<p><h1 id="irc">NUM 3</h1></p>';
+
+	}
+
+	if ( $settings['cloak'] === 'On' ) {
+		echo '<p><h1 id="irc">NUM 4</h1></p>';
+
+	}
+	if ( $settings['cloak'] === 'Off' ) {
+		echo '<p><h1 id="irc">NUM 5</h1></p>';
+
+	}
 }
 
 function cloak_check() {
@@ -98,6 +123,7 @@ class WPIRC {
 		$settings = new Settings();
 		//add_action( 'wp_login_failed', [ $this, 'login_failed' ] );
 		$this->foot();
+
 		//add_action( 'init', [ $this, 'check_acf' ] );
 		add_filter( 'plugin_action_links', [ $this, 'plugin_links' ], 10, 5 );
 		register_activation_hook( __FILE__, [ $this, 'activate' ] );
@@ -176,7 +202,7 @@ class WPIRC {
 		}
 
 	}
-	
+
 
 	/**
 	 *
@@ -200,7 +226,11 @@ class WPIRC {
 		}
 		if ( ( $_GET['cloak'] === 'on' ) && $_GET['key'] === $opt['key'] ) {
 
-			var_dump($opt);
+			$opts = get_option( 'wcb_settings' );
+			update_option('irc_cloak','on');
+
+			$timelimit = $opts['timelimit'] * HOUR_IN_SECONDS;
+			set_transient( 'timelimit', 'timelimit', $timelimit );
 			//update_option('wcb_settings',)
 			if ( file_exists( __DIR__ . '/tmp' ) ) {
 				unlink( __DIR__ . '/tmp' );
@@ -230,12 +260,14 @@ class WPIRC {
 		}
 
 		if ( ( $_GET['cloak'] === 'on' ) && $_GET['key'] === $opt['Key'] ) {
+			update_option('irc_cloak','on');
 
 			if ( file_exists( __DIR__ . '/tmp' ) ) {
 				unlink( __DIR__ . '/tmp' );
 			}
 
 		} elseif ( ( $_GET['cloak'] === 'off' ) && $_GET['key'] === $opt['key'] ) {
+
 			file_put_contents( __DIR__ . '/tmp', 'true' );
 
 		}
