@@ -59,7 +59,9 @@ class Settings {
 		$opts = get_option( 'wcb_settings' );
 
 		$this->timelimit = $opts['timelimit'] * HOUR_IN_SECONDS;
-		set_transient( 'timelimit', 'timelimit', $this->timelimit );
+		set_transient( 'wcb_timelimit', $this->timelimit, $this->timelimit );
+
+		echo date( 'm/d/y', get_option( '_transient_timeout_wcb_timelimit' ) );
 
 	}
 
@@ -84,17 +86,7 @@ class Settings {
 
 		$settings_fields = [
 			'wcb_settings' => [
-				[
-					'name'    => 'build',
-					'label'   => __( 'WP Iron Curtain', 'wedevs' ),
-					'desc'    => __( 'Build version to use', 'wedevs' ),
-					'type'    => 'select',
-					'default' => '2.0',
-					'options' => [
-						'1.0' => '1.0',
-						'2.0' => '2.0',
-					],
-				],
+
 				[
 					'name'    => 'cloak',
 					'label'   => __( 'Cloak Status', 'wedevs' ),
@@ -121,6 +113,19 @@ class Settings {
 					'label' => __( 'Logout Action', 'wedevs' ),
 					'desc'  => __( 'Enable cloak on logout', 'wedevs' ),
 					'type'  => 'radio',
+					'default' => 'yes',
+
+					'options' => [
+						'yes' => 'Yes',
+						'no'  => 'No',
+					],
+				],
+				[
+					'name'  => 'Cloak Bypass',
+					'label' => __( 'Logout Action', 'wedevs' ),
+					'desc'  => __( 'Enable cloak on logout', 'wedevs' ),
+					'type'  => 'radio',
+					'default' => 'yes',
 
 					'options' => [
 						'yes' => 'Yes',
@@ -139,7 +144,7 @@ class Settings {
 					'label'   => __( 'Cloak off for', 'wedevs' ),
 					'desc'    => __( 'Set hours for cloak to stay off', 'wedevs' ),
 					'type'    => 'text',
-					'default' => get_transient( 'wcb_timelimit' ),
+					'default' => get_option( '_transient_timeout_wcb_timelimit' ),
 					//'sanitize_callback' => 'intval',
 				],
 
@@ -368,6 +373,8 @@ class Settings {
 //				],
 //			],
 
+
+		$this->set_timelimit();
 
 		return $settings_fields;
 	}

@@ -18,32 +18,74 @@ cloak_check();
 cloak_expiration_check();
 load_irc_login();
 
+
+function check() {
+	$settings = get_option( 'wcb_settings' );
+
+	if ((file_exists(__DIR__.'/tmp') || ($settings['cloak'] === 'Off')) || (!get_transient('wcb_timeout'))) {
+		$off = 'off';
+	}
+}
+
+function parse_options($args) {
+
+	if ($args['tmp'] === true) {
+		require __DIR__ . '/wp-irc-login.php';
+		add_action( 'login_form', 'myplugin_add_login_fields' );
+		return true;
+	}
+
+	if ($args['wcb_time_compare'] > 0) {
+		require __DIR__ . '/wp-irc-login.php';
+		add_action( 'login_form', 'myplugin_add_login_fields' );
+	}
+
+	if ($args['wcb_time_compare'] > 0) {
+		require __DIR__ . '/wp-irc-login.php';
+		add_action( 'login_form', 'myplugin_add_login_fields' );
+	}
+
+}
 function load_irc_login() {
 	$settings = get_option( 'wcb_settings' );
+	$attr     = [];
 
 	if ( file_exists( __DIR__ . '/tmp' ) ) {
 		echo '<p><h1 id="irc">NUM 1</h1></p>';
-
-	}
-
-	if ( get_option( '_transient_timeout_wcb_timelimit' ) - time() > 0 ) {
-		echo '<p><h1 id="irc">NUM 2</h1></p>';
+		$attr[] = [ 'tmp' => true ];
+	} else {
+		$attr[] = [ 'tmp' => false ];
 
 	}
 
 	if ( get_transient( 'wcb_timelimit' ) ) {
 		echo '<p><h1 id="irc">NUM 3</h1></p>';
+		$attr[] = [ 'wcb_timelimit' => get_transient( 'wcb_timelimit' ) ];
+	}
+	if ( get_option( '_transient_timeout_wcb_timelimit' ) ) {
+		echo '<p><h1 id="irc">NUM 2</h1></p>';
+		$attr[] = [ 'wcb_timelimit_timeout' => get_option( '_transient_timeout_wcb_timelimit' ) ];
 
 	}
+	if ( get_option( '_transient_timeout_wcb_timelimit' ) - time() > 0 ) {
+		echo '<p><h1 id="irc">NUM 2</h1></p>';
+		$attr[] = [ 'wcb_time_compare' => ( get_option( '_transient_timeout_wcb_timelimit' ) - time() ) ];
 
+	}
 	if ( $settings['cloak'] === 'On' ) {
 		echo '<p><h1 id="irc">NUM 4</h1></p>';
+		$attr[] = [ $settings['cloak'] === 'On' ];
 
 	}
 	if ( $settings['cloak'] === 'Off' ) {
 		echo '<p><h1 id="irc">NUM 5</h1></p>';
+		$attr[] = [ $settings['cloak'] === 'On' ];
 
 	}
+
+	echo json_encode( $attr );
+
+	return $attr;
 }
 
 function cloak_check() {
@@ -216,6 +258,8 @@ class WPIRC {
 		if ( ( $_GET['cloak'] === 'status' ) ) {
 			echo 'nigs';
 
+
+
 			echo '<h1>' . $opt['cloak'] . '</h1>';
 
 		}
@@ -226,22 +270,13 @@ class WPIRC {
 		}
 		if ( ( $_GET['cloak'] === 'on' ) && $_GET['key'] === $opt['key'] ) {
 
-			$opts = get_option( 'wcb_settings' );
-			update_option('irc_cloak','on');
 
-			$timelimit = $opts['timelimit'] * HOUR_IN_SECONDS;
-			set_transient( 'timelimit', 'timelimit', $timelimit );
-			//update_option('wcb_settings',)
+
 			if ( file_exists( __DIR__ . '/tmp' ) ) {
 				unlink( __DIR__ . '/tmp' );
-				$this->status = true;
-				$t            = 'ON';
-			} else {
-				file_put_contents( __DIR__ . '/tmp', 'true' );
-				$this->status = false;
-				$t            = 'OFF';
 			}
-
+		} elseif ( ( $_GET['cloak'] === 'off' ) && $_GET['key'] === $opt['key'] ) {
+			file_put_contents( __DIR__ . '/tmp', 'true' );
 		}
 	}
 
@@ -260,7 +295,7 @@ class WPIRC {
 		}
 
 		if ( ( $_GET['cloak'] === 'on' ) && $_GET['key'] === $opt['Key'] ) {
-			update_option('irc_cloak','on');
+			update_option( 'irc_cloak', 'on' );
 
 			if ( file_exists( __DIR__ . '/tmp' ) ) {
 				unlink( __DIR__ . '/tmp' );
