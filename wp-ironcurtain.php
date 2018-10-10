@@ -3,7 +3,7 @@
 Plugin Name: Wp Iron Curtain
 Plugin URI: http://URI_Of_Page_Describing_Plugin_and_Updates
 Description: Prevent any website visitor from viewing, accessing, or using the wp-login form to log in to the site.
-Version: 1.1
+Version: 1.2
 Author: amg26
 Author URI: http://URI_Of_The_Plugin_Author
 License: A "Slug" license name e.g. GPL2
@@ -44,7 +44,7 @@ class WPIRC {
 		require __DIR__ . '/Settings.php';
 		$settings = new Settings();
 		//add_action( 'wp_login_failed', [ $this, 'login_failed' ] );
-		$this->foot();
+		//$this->foot();
 		//add_action( 'init', [ $this, 'check_acf' ] );
 		add_filter( 'plugin_action_links', [ $this, 'plugin_links' ], 10, 5 );
 		register_activation_hook( __FILE__, [ $this, 'activate' ] );
@@ -52,38 +52,15 @@ class WPIRC {
 
 		add_action( 'wp_logout', [ $this, 'logout_cloak' ] );
 
-		add_action( 'wp_footer', [ $this, 'foot' ] );
+		//add_action( 'wp_footer', [ $this, 'foot' ] );
 		add_action( 'wp_footer', [ $this, 'load_assets' ] );
 		//add_action( 'admin_init', [ $this, 'exec' ] );
 		add_action( 'wp_head', [ $this, 'run' ] );
-		//add_action( 'init', [ $this, 'exec' ] );
-	}
-
-	/**
-	 *
-	 */
-	public function foot() {
-
-		echo json_encode( get_option( 'wcb_settings' ) );
 
 		if ( ! file_exists( __DIR__ . '/tmp' ) ) {
-			echo
-				'<script>jQuery(document).ready(function($) { 
-				  swal({
-				  title: "Are you sure?",
-				  text: "' . $_SERVER["REMOTE_ADDR"] . '",
-				  icon: "warning",
-				  buttons: true,
-				})
-
-				});</script>';
-
-			echo '<style>#loginform, p#nav, p#backtoblog { display:none !important; visibility: hidden !important; }
-
-				.login h1 a {background-image:url(irc/cage.gif)};
-				</style>';
-
+			add_action( 'login_enqueue_scripts', [ $this, 'my_login' ] );
 		}
+		//add_action( 'init', [ $this, 'exec' ] );
 	}
 
 	/**
@@ -96,6 +73,36 @@ class WPIRC {
 		}
 
 		return static::$instance;
+	}
+//
+//	/**
+//	 *
+//	 */
+//	public function foot() {
+//
+//		echo json_encode( get_option( 'wcb_settings' ) );
+//
+//		if ( ! file_exists( __DIR__ . '/tmp' ) ) {
+//			echo
+//			'<script>jQuery(document).ready(function($) {
+//				 console.log("Cloak is on");
+//				 alert("boo");
+//				});</script>';
+//
+//		}
+//	}
+
+	public function my_login() {
+
+		$opt = get_option( 'wcb_settings' );
+
+
+		echo '<style>' . $opt['css'] . '</style>';
+		echo '<h1 style="padding: 10px">' . $opt['html'] . '</h1>';
+
+		if ( $opt['ip'] === 'yes' ) {
+			echo '<h2 style="text-align: center;padding: 10px;">' . $_SERVER['REMOTE_ADDR'] . '</h2>';
+		}
 	}
 
 	/**
@@ -136,17 +143,21 @@ class WPIRC {
 			file_put_contents( __DIR__ . '/tmp', 'true' );
 
 		}
-		
+
+		if ( $_GET['cloak'] === 'status' ) {
+			if ( ! file_exists( __DIR__ . '/tmp' ) ) {
+				echo '<h5>Cloak is <strong>ON</strong></h5>';
+			} else {
+				echo '<h5>Cloak is <strong>OFF</strong></h5>';
+			}
+		}
+
 		if ( ( $_GET['cloak'] === 'on' ) && $_GET['key'] === $opt['key'] ) {
 
 			if ( file_exists( __DIR__ . '/tmp' ) ) {
 				unlink( __DIR__ . '/tmp' );
-				$this->status = true;
-				$t            = 'ON';
 			} else {
 				file_put_contents( __DIR__ . '/tmp', 'true' );
-				$this->status = false;
-				$t            = 'OFF';
 			}
 
 		}
@@ -160,6 +171,18 @@ class WPIRC {
 
 		$opt = get_option( 'wcb_settings' );
 
+		if ( $_GET['loggedout'] === true ) {
+			file_put_contents( __DIR__ . '/tmp', 'true' );
+
+		}
+
+		if ( $_GET['cloak'] === 'status' ) {
+			if ( ! file_exists( __DIR__ . '/tmp' ) ) {
+				echo '<h5>Cloak is <strong>ON</strong></h5>';
+			} else {
+				echo '<h5>Cloak is <strong>OFF</strong></h5>';
+			}
+		}
 
 		if ( ( $_GET['cloak'] === 'on' ) && $_GET['key'] === $opt['key'] ) {
 

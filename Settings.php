@@ -91,15 +91,6 @@ class Settings {
 					//'sanitize_callback' => 'intval',
 				],
 				[
-					'name'    => 'date',
-					'label'   => __( 'Bypass until Day', 'wedevs' ),
-					'desc'    => __( '', 'wedevs' ),
-					'type'    => 'number',
-					'default' => date( 'd' ),
-					//'sanitize_callback' => 'intval',
-				],
-
-				[
 					'name'    => 'radio',
 					'label'   => __( 'Enable Cloak on Log Out', 'wedevs' ),
 					'desc'    => __( 'Enable Cloak on Log Out', 'wedevs' ),
@@ -110,18 +101,28 @@ class Settings {
 					],
 				],
 				[
-					'name'    => 'wysiwyg',
-					'label'   => __( 'Advanced Editor', 'wedevs' ),
+					'name'    => 'css',
+					'label'   => __( 'CSS', 'wedevs' ),
 					'desc'    => __( 'WP_Editor description', 'wedevs' ),
 					'type'    => 'wysiwyg',
 					'default' => '',
 				],
 				[
-					'name'    => 'wysiwyg',
-					'label'   => __( 'Advanced Editor', 'wedevs' ),
-					'desc'    => __( 'WP_Editor description', 'wedevs' ),
+					'name'    => 'html',
+					'label'   => __( 'HTML', 'wedevs' ),
+					'desc'    => __( '', 'wedevs' ),
 					'type'    => 'wysiwyg',
 					'default' => '',
+				],
+				[
+					'name'    => 'ip',
+					'label'   => __( 'Show IP', 'wedevs' ),
+					'desc'    => __( '', 'wedevs' ),
+					'type'    => 'radio',
+					'options' => [
+						'yes' => 'Yes',
+						'no'  => 'No',
+					],
 				],
 			]
 //				[
