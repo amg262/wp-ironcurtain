@@ -45,6 +45,22 @@ class SettingsAPI {
 		wp_enqueue_media();
 		wp_enqueue_script( 'wp-color-picker' );
 		wp_enqueue_script( 'jquery' );
+		wp_enqueue_script( 'jquery-ui' );
+
+		$opts = get_option( 'wcb_settings' );
+
+		$ajax_object = [
+			'ajax_url' => admin_url( 'admin-ajax.php' ),
+			'nonce'    => wp_create_nonce( 'bom_admin' ),
+			'ajaxid'   => $opts['ajaxid'],
+			'select2'  => $opts['select2'],
+			'action'   => [ $this, 'wco_ajax' ], //'options'  => 'wc_bom_option[opt]',
+			'options'  => ( $opts ),
+			'options2' => json_encode( $opts ),
+		];
+
+		wp_enqueue_script( 'wp-bom-admin-js', plugins_url( 'settings.js', __FILE__ ), [ 'jquery' ] );
+		wp_localize_script( 'wp-bom-admin-js', 'ajax_object', $ajax_object );
 	}
 
 	/**
@@ -159,19 +175,13 @@ class SettingsAPI {
 	}
 
 	/**
-	 * Get field description for display
+	 * Displays a url field for a settings field
 	 *
 	 * @param array $args settings field args
 	 */
-	public function get_field_description( $args ) {
+	function callback_url( $args ) {
 
-		if ( ! empty( $args['desc'] ) ) {
-			$desc = sprintf( '<p class="description">%s</p>', $args['desc'] );
-		} else {
-			$desc = '';
-		}
-
-		return $desc;
+		$this->callback_text( $args );
 	}
 
 	/**
@@ -192,13 +202,39 @@ class SettingsAPI {
 	}
 
 	/**
-	 * Displays a url field for a settings field
+	 * Get the value of a settings field
+	 *
+	 * @param string $option  settings field name
+	 * @param string $section the section name this field belongs to
+	 * @param string $default default text if it's not found
+	 *
+	 * @return string
+	 */
+	function get_option( $option, $section, $default = '' ) {
+
+		$options = get_option( $section );
+
+		if ( isset( $options[ $option ] ) ) {
+			return $options[ $option ];
+		}
+
+		return $default;
+	}
+
+	/**
+	 * Get field description for display
 	 *
 	 * @param array $args settings field args
 	 */
-	function callback_url( $args ) {
+	public function get_field_description( $args ) {
 
-		$this->callback_text( $args );
+		if ( ! empty( $args['desc'] ) ) {
+			$desc = sprintf( '<p class="description">%s</p>', $args['desc'] );
+		} else {
+			$desc = '';
+		}
+
+		return $desc;
 	}
 
 	/**
@@ -451,26 +487,6 @@ class SettingsAPI {
 	}
 
 	/**
-	 * Get the value of a settings field
-	 *
-	 * @param string $option  settings field name
-	 * @param string $section the section name this field belongs to
-	 * @param string $default default text if it's not found
-	 *
-	 * @return string
-	 */
-	function get_option( $option, $section, $default = '' ) {
-
-		$options = get_option( $section );
-
-		if ( isset( $options[ $option ] ) ) {
-			return $options[ $option ];
-		}
-
-		return $default;
-	}
-
-	/**
 	 * Show navigations as tab
 	 *
 	 * Shows all the settings section labels as tab
@@ -528,73 +544,70 @@ class SettingsAPI {
 	 */
 	function script() { ?>
         <script>
-			jQuery(document).ready(function ($) {
-				//Initiate Color Picker
-				$('.wp-color-picker-field').wpColorPicker();
+          jQuery(document).ready(function($) {
+            //Initiate Color Picker
+            $('.wp-color-picker-field').wpColorPicker();
 
-				// Switches option sections
-				$('.group').hide();
-				var activetab = '';
-				if (typeof (localStorage) != 'undefined') {
-					activetab = localStorage.getItem('activetab');
-				}
-				if (activetab != '' && $(activetab).length) {
-					$(activetab).fadeIn();
-				} else {
-					$('.group:first').fadeIn();
-				}
-				$('.group .collapsed').each(function () {
-					$(this).find('input:checked').parent().parent().parent().nextAll().each(
-						function () {
-							if ($(this).hasClass('last')) {
-								$(this).removeClass('hidden');
-								return false;
-							}
-							$(this).filter('.hidden').removeClass('hidden');
-						});
-				});
+            // Switches option sections
+            $('.group').hide();
+            var activetab = '';
+            if (typeof (localStorage) != 'undefined') {
+              activetab = localStorage.getItem('activetab');
+            }
+            if (activetab != '' && $(activetab).length) {
+              $(activetab).fadeIn();
+            } else {
+              $('.group:first').fadeIn();
+            }
+            $('.group .collapsed').each(function() {
+              $(this).find('input:checked').parent().parent().parent().nextAll().each(function() {
+                if ($(this).hasClass('last')) {
+                  $(this).removeClass('hidden');
+                  return false;
+                }
+                $(this).filter('.hidden').removeClass('hidden');
+              });
+            });
 
-				if (activetab != '' && $(activetab + '-tab').length) {
-					$(activetab + '-tab').addClass('nav-tab-active');
-				} else {
-					$('.nav-tab-wrapper a:first').addClass('nav-tab-active');
-				}
-				$('.nav-tab-wrapper a').click(function (evt) {
-					$('.nav-tab-wrapper a').removeClass('nav-tab-active');
-					$(this).addClass('nav-tab-active').blur();
-					var clicked_group = $(this).attr('href');
-					if (typeof (localStorage) != 'undefined') {
-						localStorage.setItem('activetab', $(this).attr('href'));
-					}
-					$('.group').hide();
-					$(clicked_group).fadeIn();
-					evt.preventDefault();
-				});
+            if (activetab != '' && $(activetab + '-tab').length) {
+              $(activetab + '-tab').addClass('nav-tab-active');
+            } else {
+              $('.nav-tab-wrapper a:first').addClass('nav-tab-active');
+            }
+            $('.nav-tab-wrapper a').click(function(evt) {
+              $('.nav-tab-wrapper a').removeClass('nav-tab-active');
+              $(this).addClass('nav-tab-active').blur();
+              var clicked_group = $(this).attr('href');
+              if (typeof (localStorage) != 'undefined') {
+                localStorage.setItem('activetab', $(this).attr('href'));
+              }
+              $('.group').hide();
+              $(clicked_group).fadeIn();
+              evt.preventDefault();
+            });
 
-				$('.wpsa-browse').on('click', function (event) {
-					event.preventDefault();
+            $('.wpsa-browse').on('click', function(event) {
+              event.preventDefault();
 
-					var self = $(this);
+              var self = $(this);
 
-					// Create the media frame.
-					var file_frame = wp.media.frames.file_frame = wp.media({
-						title: self.data('uploader_title'),
-						button: {
-							text: self.data('uploader_button_text'),
-						},
-						multiple: false,
-					});
+              // Create the media frame.
+              var file_frame = wp.media.frames.file_frame = wp.media({
+                title: self.data('uploader_title'), button: {
+                  text: self.data('uploader_button_text'),
+                }, multiple: false,
+              });
 
-					file_frame.on('select', function () {
-						attachment = file_frame.state().get('selection').first().toJSON();
+              file_frame.on('select', function() {
+                attachment = file_frame.state().get('selection').first().toJSON();
 
-						self.prev('.wpsa-url').val(attachment.url);
-					});
+                self.prev('.wpsa-url').val(attachment.url);
+              });
 
-					// Finally, open the modal
-					file_frame.open();
-				});
-			});
+              // Finally, open the modal
+              file_frame.open();
+            });
+          });
         </script>
 
         <style type="text/css">
