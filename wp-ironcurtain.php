@@ -47,8 +47,6 @@ class WPIRC {
 		//$this->foot();
 		//add_action( 'init', [ $this, 'check_acf' ] );
 		add_filter( 'plugin_action_links', [ $this, 'plugin_links' ], 10, 5 );
-		register_activation_hook( __FILE__, [ $this, 'activate' ] );
-		register_deactivation_hook( __FILE__, [ $this, 'deactivate' ] );
 
 		add_action( 'wp_logout', [ $this, 'logout_cloak' ] );
 
