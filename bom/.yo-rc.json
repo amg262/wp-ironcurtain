@@ -1,0 +1,20 @@
+{
+  "generator-plugin-wp": {
+    "name": "BOM",
+    "homepage": "http://netraa.net",
+    "description": "A radical new plugin for WordPress!",
+    "version": "0.0.0",
+    "author": "amg26",
+    "authoremail": "andrewmgunn26@gmail.com",
+    "authorurl": "http://netraa.net",
+    "license": "GPLv2",
+    "slug": "bom",
+    "classname": "BOM",
+    "mainclassname": "BOM",
+    "classprefix": "BOM_",
+    "prefix": "bom",
+    "year": 2018,
+    "currentVersionWP": "4.8.1",
+    "plugingenversion": "0.20.2"
+  }
+}

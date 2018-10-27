@@ -1,0 +1,23 @@
+{
+	"name": "bom",
+	"description": "A radical new plugin for WordPress!",
+	"keywords": ["wordpress", "plugin", "generator-plugin-wp"],
+	"homepage": "http://netraa.net",
+	"license": "GPLv2",
+	"authors": [
+	{
+		"name": "amg26",
+		"homepage": "http://netraa.net"
+	}
+	],
+	"minimum-stability": "dev",
+	"type": "wordpress-plugin",
+	"autoload": {
+		"classmap": ["bom.php", "includes/"]
+	},
+	"require": {
+		"webdevstudios/cmb2": "dev-master",
+		"webdevstudios/cpt-core": "dev-master",
+		"webdevstudios/taxonomy_core": "dev-master"
+	}
+}
