@@ -47,17 +47,14 @@ class SettingsAPI {
 		wp_enqueue_media();
 		wp_enqueue_script( 'wp-color-picker' );
 		wp_enqueue_script( 'jquery' );
+		wp_enqueue_script( 'jquery-ui' );
 
 		wp_enqueue_script( 'sweetalertjs', 'https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js' );
 		wp_enqueue_style( 'sweetalert_css', 'https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css' );
-		wp_enqueue_script( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/js/select2.full.min.js' );
-		wp_enqueue_style( 'sselect2_css', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/css/select2.min.css' );
-		wp_register_script( 'chosen_js', 'https://cdnjs.cloudflare.com/ajax/libs/chosen/1.7.0/chosen.jquery.min.js', [ 'jquery' ] );
-		wp_register_style( 'chosen_css', 'https://cdnjs.cloudflare.com/ajax/libs/chosen/1.7.0/chosen.min.css' );
-		wp_enqueue_script( 'postbox' );
-		//wp_enqueue_script( 'bom_adm_js' );
-		wp_enqueue_script( 'chosen_js' );
-		wp_enqueue_style( 'chosen_css' );
+		wp_enqueue_script( 'chosen_js', 'https://cdnjs.cloudflare.com/ajax/libs/chosen/1.7.0/chosen.jquery.min.js' );
+		wp_enqueue_style( 'chosen_css', 'https://cdnjs.cloudflare.com/ajax/libs/chosen/1.7.0/chosen.min.css' );
+
+
 		$opts = get_option( 'bom_settings' );
 
 		$ajax_object = [
@@ -70,8 +67,8 @@ class SettingsAPI {
 			'options2' => json_encode( $opts ),
 		];
 
-		wp_enqueue_script( 'wp-bom-admin-js', plugins_url( 'assets/js/settings.js', dirname( __FILE__ ) ), [ 'jquery' ] );
-		wp_localize_script( 'wp-bom-admin-js', 'ajax_object', $ajax_object );
+		wp_enqueue_script( 'wp-irc-admin-js', plugins_url( 'assets/js/settings.js', dirname( __FILE__ ) ), [ 'jquery' ] );
+		wp_localize_script( 'wp-irc-admin-js', 'ajax_object', $ajax_object );
 
 	}
 
@@ -621,7 +618,6 @@ class SettingsAPI {
 							$atts = [ 'id' => 'save_settings_' . $i ];
 
 							submit_button( 'Save Settings', 'primary', $atts['id'], true, $atts );
-
 
 							$i ++;
 							?>

@@ -51,10 +51,9 @@ class Plugin {
 	 * @since    1.0.0
 	 */
 	public static function activate() {
-		add_option( 'bom_example_setting' );
-		add_option( 'wpbs_settings' );
-		add_option( 'wpbs_options' );
-		add_option( 'wpbs_data' );
+		add_option( 'irc_settings' );
+		add_option( 'irc_config' );
+		add_option( 'irc_data' );
 		flush_rewrite_rules();
 	}
 

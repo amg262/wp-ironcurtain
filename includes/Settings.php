@@ -60,66 +60,70 @@ class Settings {
 
 		$settings_fields = [
 			'irc_settings' => [
+
 				[
-					'name'              => 'key',
-					'label'             => __( 'Text Input', 'wedevs' ),
-					'desc'              => __( 'Text input description', 'wedevs' ),
-					'type'              => 'text',
-					'default'           => 'Title',
-					'sanitize_callback' => 'intval',
+					'name'    => 'key',
+					'label'   => __( 'Secret Key', 'wedevs' ),
+					'desc'    => __( '<i>http://rbrvs.net/?cloak=on&<b>key=</b> *this field </i>', 'wedevs' ),
+					'type'    => 'text',
+					'default' => 'stalin',
+					//'sanitize_callback' => 'intval',
 				],
-				[
-					'name'              => 'number_input',
-					'label'             => __( 'Number Input', 'wedevs' ),
-					'desc'              => __( 'Number field with validation callback `intval`', 'wedevs' ),
-					'type'              => 'number',
-					'default'           => 'Title',
-					'sanitize_callback' => 'intval',
-				],
-				[
-					'name'    => 'textarea',
-					'label'   => __( 'Textarea Input', 'wedevs' ),
-					'desc'    => __( 'Textarea description', 'wedevs' ),
-					'default' => '',
-					'type'    => 'textarea',
-				],
-				[
-					'name'    => 'checkbox',
-					'label'   => __( 'Checkbox', 'wedevs' ),
-					'desc'    => __( 'Checkbox Label', 'wedevs' ),
-					'default' => '',
-					'type'    => 'checkbox',
-				],
+
 				[
 					'name'    => 'radio',
-					'label'   => __( 'Radio Button', 'wedevs' ),
-					'desc'    => __( 'A radio button', 'wedevs' ),
+					'label'   => __( 'Enable Cloak on Log Out', 'wedevs' ),
+					'desc'    => __( 'Enable Cloak on Log Out', 'wedevs' ),
 					'type'    => 'radio',
-					'default' => '',
-
 					'options' => [
 						'yes' => 'Yes',
 						'no'  => 'No',
 					],
 				],
 				[
-					'name'    => 'activecpt',
-					'label'   => __( 'Post Types', 'wedevs' ),
-					'desc'    => __( 'Multi checkbox description', 'wedevs' ),
-					'type'    => 'multicheck',
+					'name'    => 'css',
+					'label'   => __( 'CSS', 'wedevs' ),
+					'desc'    => __( 'WP_Editor description', 'wedevs' ),
+					'type'    => 'wysiwyg',
 					'default' => '',
-
+				],
+				[
+					'name'    => 'html',
+					'label'   => __( 'HTML', 'wedevs' ),
+					'desc'    => __( '', 'wedevs' ),
+					'type'    => 'wysiwyg',
+					'default' => '',
+				],
+				[
+					'name'    => 'ip',
+					'label'   => __( 'Show IP', 'wedevs' ),
+					'desc'    => __( '', 'wedevs' ),
+					'type'    => 'radio',
 					'options' => [
-						'Part'        => 'Part',
-						'Assembly'    => 'Assembly',
-						'Requisition' => 'Requisition',
-						'ECN'         => 'ECN',
-						'IRC'         => 'IRC',
-						'Product'     => 'Product',
+						'yes' => 'Yes',
+						'no'  => 'No',
 					],
 				],
 			],
 			'irc_config'   => [
+				[
+					'name'    => 'notify',
+					'label'   => __( 'Notify status change', 'wedevs' ),
+					'desc'    => __( 'Email current status when changed', 'wedevs' ),
+					'type'    => 'radio',
+					'default' => '',
+					'options' => [
+						'yes' => 'Yes',
+						'no'  => 'No',
+					],
+				],
+				[
+					'name'              => 'email',
+					'label'             => __( 'Sent to email', 'wedevs' ),
+					'desc'              => __( 'Seperated by comma', 'wedevs' ),
+					'type'              => 'text',
+					'default'           => 'rwasser63@gmail.com,andrewmgunn26@gmail.com',
+				],
 				[
 					'name'    => 'activetaxs',
 					'label'   => __( 'Taxonomy', 'wedevs' ),
@@ -134,6 +138,13 @@ class Settings {
 						'Location'      => 'Location',
 						'Req Type'      => 'Req Type',
 					],
+				],
+				[
+					'name'    => 'wysiwyg',
+					'label'   => __( 'Advanced Editor', 'wedevs' ),
+					'desc'    => __( 'WP_Editor description', 'wedevs' ),
+					'type'    => 'wysiwyg',
+					'default' => '',
 				],
 				[
 					'name'    => 'ajaxid',
@@ -164,44 +175,9 @@ class Settings {
 					'type'    => 'password',
 					'default' => '',
 				],
-				[
-					'name'    => 'file',
-					'label'   => __( 'File', 'wedevs' ),
-					'desc'    => __( 'File description', 'wedevs' ),
-					'type'    => 'file',
-					'default' => '',
-					'options' => [
-						'button_label' => 'Choose Image',
-					],
-				],
-				[
-					'name'    => 'color',
-					'label'   => __( 'Color', 'wedevs' ),
-					'desc'    => __( 'Color description', 'wedevs' ),
-					'type'    => 'color',
-					'default' => '',
-				],
-				[
-					'name'    => 'wysiwyg',
-					'label'   => __( 'Advanced Editor', 'wedevs' ),
-					'desc'    => __( 'WP_Editor description', 'wedevs' ),
-					'type'    => 'wysiwyg',
-					'default' => '',
-				],
-
-				[
-					'name'    => 'selectbox',
-					'label'   => __( 'A Dropdown', 'wedevs' ),
-					'desc'    => __( 'Dropdown description', 'wedevs' ),
-					'type'    => 'select',
-					'default' => '',
-
-					'options' => [
-						'yes' => 'Yes',
-						'no'  => 'No',
-					],
-				],
 			],
+
+			'irc_data' => [],
 
 
 		];
@@ -220,7 +196,7 @@ class Settings {
 	function plugin_page() {
 
 		echo '<div class="wrap">';
-
+		echo '<h1>WP Iron Curtain</h1>';
 		$this->settings_api->show_navigation();
 		$this->settings_api->show_forms();
 
