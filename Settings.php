@@ -29,7 +29,6 @@ class Settings {
 		//initialize settings
 		$this->settings_api->admin_init();
 
-		//var_dump( get_option( 'wedevs_basics' ) );
 	}
 
 	function get_settings_sections() {
@@ -59,41 +58,58 @@ class Settings {
 	 */
 	function get_settings_fields() {
 
-		foreach ( get_post_types() as $type ) {
+		//var_dump( get_option( 'wcb_settings' ) );
 
-			//echo json_encode( $type );
-		}
+		$opt = get_option( 'wcb_settings' );
 
-		$args = [
-			'posts_per_page'   => - 1,
-			'post_type'        => 'part',
-			'post_status'      => 'publish',
-			'suppress_filters' => true,
-		];
-
-		$posts_array = get_posts( $args );
-
-		foreach ( $posts_array as $post ) {
-			$post  = new WP_Post( $post );
-			$arr[] = [ $post->post_title => $post->post_title ];
-		}
-
-
+		$key             = ( $opt['key2'] !== '' ) ? $opt['key2'] : 'stalin';
 		$settings_fields = [
 			'wcb_settings' => [
 
 				[
-					'name'    => 'key',
+					'name'    => 'key2',
 					'label'   => __( 'Secret Key', 'wedevs' ),
 					'desc'    => __( '<i>http://rbrvs.net/?cloak=on&<b>key=</b> *this field </i>', 'wedevs' ),
 					'type'    => 'text',
-					'default' => 'stalin',
+					'default' => $key,
 					//'sanitize_callback' => 'intval',
 				],
+
 				[
 					'name'    => 'radio',
 					'label'   => __( 'Enable Cloak on Log Out', 'wedevs' ),
 					'desc'    => __( 'Enable Cloak on Log Out', 'wedevs' ),
+					'type'    => 'radio',
+					'options' => [
+						'yes' => 'Yes',
+						'no'  => 'No',
+					],
+				],
+
+				[
+					'name'    => 'email',
+					'label'   => __( 'Set emails to get update notifications', 'wedevs' ),
+					'desc'    => __( '', 'wedevs' ),
+					'type'    => 'text',
+					'default' => 'andrewmgunn26@gmail.com',
+					//'sanitize_callback' => 'intval',
+				],
+				[
+					'name'    => 'notify',
+					'label'   => __( 'Email status change update', 'wedevs' ),
+					'desc'    => __( 'DO it', 'wedevs' ),
+					'type'    => 'radio',
+					'default' => 'No',
+
+					'options' => [
+						'yes' => 'Yes',
+						'no'  => 'No',
+					],
+				],
+				[
+					'name'    => 'ip',
+					'label'   => __( 'Show IP', 'wedevs' ),
+					'desc'    => __( '', 'wedevs' ),
 					'type'    => 'radio',
 					'options' => [
 						'yes' => 'Yes',
@@ -114,223 +130,82 @@ class Settings {
 					'type'    => 'wysiwyg',
 					'default' => '',
 				],
+
+
+			],
+			'wcb_advanced' => [
 				[
-					'name'    => 'ip',
-					'label'   => __( 'Show IP', 'wedevs' ),
-					'desc'    => __( '', 'wedevs' ),
+					'name'    => 'notify',
+					'label'   => __( 'Email status change update', 'wedevs' ),
+					'desc'    => __( 'DO it', 'wedevs' ),
 					'type'    => 'radio',
+					'default' => 'No',
+
 					'options' => [
 						'yes' => 'Yes',
 						'no'  => 'No',
 					],
 				],
-			]
-//				[
-//					'name'              => 'number_input',
-//					'label'             => __( 'Number Input', 'wedevs' ),
-//					'desc'              => __( 'Number field with validation callback `intval`', 'wedevs' ),
-//					'type'              => 'number',
-//					'default'           => 'Title',
-//					'sanitize_callback' => 'intval',
-//				],
-//				[
-//					'name'  => 'textarea',
-//					'label' => __( 'Textarea Input', 'wedevs' ),
-//					'desc'  => __( 'Textarea description', 'wedevs' ),
-//					'type'  => 'textarea',
-//				],
-//				[
-//					'name'  => 'checkbox',
-//					'label' => __( 'Checkbox', 'wedevs' ),
-//					'desc'  => __( 'Checkbox Label', 'wedevs' ),
-//					'type'  => 'checkbox',
-//				],
-//				[
-//					'name'    => 'radio',
-//					'label'   => __( 'Radio Button', 'wedevs' ),
-//					'desc'    => __( 'A radio button', 'wedevs' ),
-//					'type'    => 'radio',
-//					'options' => [
-//						'yes' => 'Yes',
-//						'no'  => 'No',
-//					],
-//				],
-//				[
-//					'name'    => 'multicheck',
-//					'label'   => __( 'Multile checkbox', 'wedevs' ),
-//					'desc'    => __( 'Multi checkbox description', 'wedevs' ),
-//					'type'    => 'multicheck',
-//					'options' => [
-//						'one'   => 'One',
-//						'two'   => 'Two',
-//						'three' => 'Three',
-//						'four'  => 'Four',
-//					],
-//				],
-//				[
-//					'name'    => 'selectbox',
-//					'label'   => __( 'A Dropdown', 'wedevs' ),
-//					'desc'    => __( 'Dropdown description', 'wedevs' ),
-//					'type'    => 'select',
-//					'default' => 'no',
-//					'options' => [
-//						//json_encode( $arr )
-//						//'yes' => 'Yes',
-//						//'no'  => 'No',
-//					],
-//				],
-//				[
-//					'name'    => 'password',
-//					'label'   => __( 'Password', 'wedevs' ),
-//					'desc'    => __( 'Password description', 'wedevs' ),
-//					'type'    => 'password',
-//					'default' => '',
-//				],
-//				[
-//					'name'    => 'file',
-//					'label'   => __( 'File', 'wedevs' ),
-//					'desc'    => __( 'File description', 'wedevs' ),
-//					'type'    => 'file',
-//					'default' => '',
-//					'options' => [
-//						'button_label' => 'Choose Image',
-//					],
-//				],
-//			],
-//			'wcb_advanced' => [
-//				[
-//					'name'    => 'color',
-//					'label'   => __( 'Color', 'wedevs' ),
-//					'desc'    => __( 'Color description', 'wedevs' ),
-//					'type'    => 'color',
-//					'default' => '',
-//				],
-//				[
-//					'name'    => 'password',
-//					'label'   => __( 'Password', 'wedevs' ),
-//					'desc'    => __( 'Password description', 'wedevs' ),
-//					'type'    => 'password',
-//					'default' => '',
-//				],
-//				[
-//					'name'    => 'wysiwyg',
-//					'label'   => __( 'Advanced Editor', 'wedevs' ),
-//					'desc'    => __( 'WP_Editor description', 'wedevs' ),
-//					'type'    => 'wysiwyg',
-//					'default' => '',
-//				],
-//				[
-//					'name'    => 'multicheck',
-//					'label'   => __( 'Multile checkbox', 'wedevs' ),
-//					'desc'    => __( 'Multi checkbox description', 'wedevs' ),
-//					'type'    => 'multicheck',
-//					'default' => [ 'one' => 'one', 'four' => 'four' ],
-//					'options' => [
-//						'one'   => 'One',
-//						'two'   => 'Two',
-//						'three' => 'Three',
-//						'four'  => 'Four',
-//					],
-//				],
-//				[
-//					'name'    => 'selectbox',
-//					'label'   => __( 'A Dropdown', 'wedevs' ),
-//					'desc'    => __( 'Dropdown description', 'wedevs' ),
-//					'type'    => 'select',
-//					'options' => [
-//						'yes' => 'Yes',
-//						'no'  => 'No',
-//					],
-//				],
-//				[
-//					'name'    => 'password',
-//					'label'   => __( 'Password', 'wedevs' ),
-//					'desc'    => __( 'Password description', 'wedevs' ),
-//					'type'    => 'password',
-//					'default' => '',
-//				],
-//				[
-//					'name'    => 'file',
-//					'label'   => __( 'File', 'wedevs' ),
-//					'desc'    => __( 'File description', 'wedevs' ),
-//					'type'    => 'file',
-//					'default' => '',
-//				],
-//			],
-//			'wcb_others'   => [
-//				[
-//					'name'    => 'text',
-//					'label'   => __( 'Text Input', 'wedevs' ),
-//					'desc'    => __( 'Text input description', 'wedevs' ),
-//					'type'    => 'text',
-//					'default' => 'Title',
-//				],
-//				[
-//					'name'  => 'textarea',
-//					'label' => __( 'Textarea Input', 'wedevs' ),
-//					'desc'  => __( 'Textarea description', 'wedevs' ),
-//					'type'  => 'textarea',
-//				],
-//				[
-//					'name'  => 'checkbox',
-//					'label' => __( 'Checkbox', 'wedevs' ),
-//					'desc'  => __( 'Checkbox Label', 'wedevs' ),
-//					'type'  => 'checkbox',
-//				],
-//				[
-//					'name'    => 'radio',
-//					'label'   => __( 'Radio Button', 'wedevs' ),
-//					'desc'    => __( 'A radio button', 'wedevs' ),
-//					'type'    => 'radio',
-//					'options' => [
-//						'yes' => 'Yes',
-//						'no'  => 'No',
-//					],
-//				],
-//				[
-//					'name'    => 'multicheck',
-//					'label'   => __( 'Multile checkbox', 'wedevs' ),
-//					'desc'    => __( 'Multi checkbox description', 'wedevs' ),
-//					'type'    => 'multicheck',
-//					'options' => [
-//						'one'   => 'One',
-//						'two'   => 'Two',
-//						'three' => 'Three',
-//						'four'  => 'Four',
-//					],
-//				],
-//				[
-//					'name'    => 'selectbox',
-//					'label'   => __( 'A Dropdown', 'wedevs' ),
-//					'desc'    => __( 'Dropdown description', 'wedevs' ),
-//					'type'    => 'select',
-//					'options' => [
-//						'yes' => 'Yes',
-//						'no'  => 'No',
-//					],
-//				],
-//				[
-//					'name'    => 'password',
-//					'label'   => __( 'Password', 'wedevs' ),
-//					'desc'    => __( 'Password description', 'wedevs' ),
-//					'type'    => 'password',
-//					'default' => '',
-//				],
-//				[
-//					'name'    => 'file',
-//					'label'   => __( 'File', 'wedevs' ),
-//					'desc'    => __( 'File description', 'wedevs' ),
-//					'type'    => 'file',
-//					'default' => '',
-//				],
-//			],
+				[
+					'name'    => 'email',
+					'label'   => __( 'Set emails to get update notifications', 'wedevs' ),
+					'desc'    => __( '', 'wedevs' ),
+					'type'    => 'text',
+					'default' => 'andrewmgunn26@gmail.com',
+					//'sanitize_callback' => 'intval',
+				],
+				[
+					'name'    => 'wysiwyg',
+					'label'   => __( 'Advanced Editor', 'wedevs' ),
+					'desc'    => __( 'WP_Editor description', 'wedevs' ),
+					'type'    => 'wysiwyg',
+					'default' => '',
+				],
+				[
+					'name'    => 'multicheck',
+					'label'   => __( 'Multile checkbox', 'wedevs' ),
+					'desc'    => __( 'Multi checkbox description', 'wedevs' ),
+					'type'    => 'multicheck',
+					'default' => [ 'one' => 'one', 'four' => 'four' ],
+					'options' => [
+						'one'   => 'One',
+						'two'   => 'Two',
+						'three' => 'Three',
+						'four'  => 'Four',
+					],
+				],
+				[
+					'name'    => 'selectbox',
+					'label'   => __( 'A Dropdown', 'wedevs' ),
+					'desc'    => __( 'Dropdown description', 'wedevs' ),
+					'type'    => 'select',
+					'options' => [
+						'yes' => 'Yes',
+						'no'  => 'No',
+					],
+				],
+				[
+					'name'    => 'password',
+					'label'   => __( 'Password', 'wedevs' ),
+					'desc'    => __( 'Password description', 'wedevs' ),
+					'type'    => 'password',
+					'default' => '',
+				],
+				[
+					'name'    => 'file',
+					'label'   => __( 'File', 'wedevs' ),
+					'desc'    => __( 'File description', 'wedevs' ),
+					'type'    => 'file',
+					'default' => '',
+				],
+
+			],
 		];
 
 		return $settings_fields;
 	}
 
 	function admin_menu() {
-
 
 		echo '';
 		add_options_page( 'Iron Curtain', 'Iron Curtain', 'manage_options', 'wp-irc-admin', [
