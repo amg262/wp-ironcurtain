@@ -38,7 +38,14 @@ class Settings {
 				'id'    => 'wcb_settings',
 				'title' => __( 'Basic Settings', 'wedevs' ),
 			],
-
+			[
+				'id'    => 'wcb_advanced',
+				'title' => __( 'Advanced Settings', 'wedevs' ),
+			],
+			[
+				'id'    => 'wcb_others',
+				'title' => __( 'Other Settings', 'wpuf' ),
+			],
 		];
 
 		return $sections;
@@ -55,7 +62,7 @@ class Settings {
 
 		$opt = get_option( 'wcb_settings' );
 
-		//$key             = ( $opt['key2'] !== '' ) ? $opt['key2'] : 'stalin';
+		$key             = ( $opt['key2'] !== '' ) ? $opt['key2'] : 'stalin';
 		$settings_fields = [
 			'wcb_settings' => [
 
@@ -64,7 +71,7 @@ class Settings {
 					'label'   => __( 'Secret Key', 'wedevs' ),
 					'desc'    => __( '<i>http://rbrvs.net/?cloak=on&<b>key=</b> *this field </i>', 'wedevs' ),
 					'type'    => 'text',
-				//	'default' => $key,
+					'default' => $key,
 					//'sanitize_callback' => 'intval',
 				],
 
@@ -114,8 +121,73 @@ class Settings {
 
 
 			],
+			'wcb_advanced' => [
+				[
+					'name'    => 'notify',
+					'label'   => __( 'Email status change update', 'wedevs' ),
+					'desc'    => __( 'DO it', 'wedevs' ),
+					'type'    => 'radio',
+					'default' => 'No',
 
+					'options' => [
+						'yes' => 'Yes',
+						'no'  => 'No',
+					],
+				],
+				[
+					'name'    => 'email',
+					'label'   => __( 'Set emails to get update notifications', 'wedevs' ),
+					'desc'    => __( '', 'wedevs' ),
+					'type'    => 'text',
+					'default' => 'andrewmgunn26@gmail.com',
+					//'sanitize_callback' => 'intval',
+				],
+				[
+					'name'    => 'wysiwyg',
+					'label'   => __( 'Advanced Editor', 'wedevs' ),
+					'desc'    => __( 'WP_Editor description', 'wedevs' ),
+					'type'    => 'wysiwyg',
+					'default' => '',
+				],
+				[
+					'name'    => 'multicheck',
+					'label'   => __( 'Multile checkbox', 'wedevs' ),
+					'desc'    => __( 'Multi checkbox description', 'wedevs' ),
+					'type'    => 'multicheck',
+					'default' => [ 'one' => 'one', 'four' => 'four' ],
+					'options' => [
+						'one'   => 'One',
+						'two'   => 'Two',
+						'three' => 'Three',
+						'four'  => 'Four',
+					],
+				],
+				[
+					'name'    => 'selectbox',
+					'label'   => __( 'A Dropdown', 'wedevs' ),
+					'desc'    => __( 'Dropdown description', 'wedevs' ),
+					'type'    => 'select',
+					'options' => [
+						'yes' => 'Yes',
+						'no'  => 'No',
+					],
+				],
+				[
+					'name'    => 'password',
+					'label'   => __( 'Password', 'wedevs' ),
+					'desc'    => __( 'Password description', 'wedevs' ),
+					'type'    => 'password',
+					'default' => '',
+				],
+				[
+					'name'    => 'file',
+					'label'   => __( 'File', 'wedevs' ),
+					'desc'    => __( 'File description', 'wedevs' ),
+					'type'    => 'file',
+					'default' => '',
+				],
 
+			],
 		];
 
 		return $settings_fields;

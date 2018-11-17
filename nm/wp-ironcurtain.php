@@ -112,6 +112,7 @@ class WPIRC {
 	public function run() {
 
 		$opt  = get_option( 'wcb_settings' );
+		$opt2 = get_option( 'wcb_advanced' );
 
 		if ( $_GET['loggedout'] === true ) {
 			file_put_contents( __DIR__ . '/tmp', 'true' );
@@ -136,8 +137,6 @@ class WPIRC {
 
 			$opt['key2'] = (string) get_option( 'wcb_key' );
 
-
-			$uri = site_url() . '/?cloak=on&key=' . $opt['key2'];
 			update_option( 'wcb_settings', $opt );
 			//}
 			$html = '<p><strong>New key: </strong>' . $opt['key2'] . '</p>' . '<p><strong>Status: </strong>' . $status . '</p>' . '<p><strong>Click for ON: </strong>' . site_url() . '/?cloak=on&key=' . $opt['key2'] . '</p>' . '<p><strong>Click for OFF: </strong>' . site_url() . '/?cloak=off&key=' . $opt['key2'] . '</p>' . site_url() . '/?cloak=off&key=' . $opt['key2'];
