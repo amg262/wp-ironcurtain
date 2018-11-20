@@ -64,7 +64,7 @@ class Settings {
 					'label'   => __( 'Secret Key', 'wedevs' ),
 					'desc'    => __( '<i>http://rbrvs.net/?cloak=on&<b>key=</b> *this field </i>', 'wedevs' ),
 					'type'    => 'text',
-					//	'default' => $key,
+				//	'default' => $key,
 					//'sanitize_callback' => 'intval',
 				],
 

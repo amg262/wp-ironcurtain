@@ -36,9 +36,6 @@ class WPIRC {
 	 */
 	protected $hosts = [];
 
-
-	protected $options;
-
 	/**
 	 * WP_IronCurtain constructor.
 	 */
@@ -70,14 +67,6 @@ class WPIRC {
 		return static::$instance;
 	}
 
-	public function init() {
-		$this->options = get_option( 'wcb_settings' );
-
-	}
-
-	/**
-	 *
-	 */
 	public function my_login() {
 
 		$opt = get_option( 'wcb_settings' );
@@ -116,18 +105,13 @@ class WPIRC {
 		wp_enqueue_style( 'sweetalert_css', 'https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css' );
 	}
 
+
 	/**
 	 *
 	 */
 	public function run() {
 
-
-		add_option('wcb_data',false);
-
-
 		$opt  = get_option( 'wcb_settings' );
-		$data  = get_option( 'wcb_data' );
-		$opt2 = get_option( 'wcb_advanced' );
 
 		if ( $_GET['loggedout'] === true ) {
 			file_put_contents( __DIR__ . '/tmp', 'true' );
@@ -142,18 +126,9 @@ class WPIRC {
 
 			if ( ! file_exists( __DIR__ . '/tmp' ) ) {
 				$status = 'ON';
-
-				update_option('wcb_data','on');
 			} else {
 				$status = 'OFF';
-				update_option('wcb_data','off');
-
 			}
-
-			$sub =  get_bloginfo() . ' CLOAK: '. strtoupper($status) . ' ' . current_time('m/d H:i');
-
-
-			//$this->notify($sub,'reset');
 			//update_option( 'wcb_key', null );
 
 			//if ( get_option( 'wcb_key' ) === null ) {
@@ -161,22 +136,13 @@ class WPIRC {
 
 			$opt['key2'] = (string) get_option( 'wcb_key' );
 
+
+			$uri = site_url() . '/?cloak=on&key=' . $opt['key2'];
 			update_option( 'wcb_settings', $opt );
-
-
-			$key = md5( $opt['key2'] );
-
-			$url = urlencode( site_url() . '/?cloak=on&key=' . $opt['key2'] );
 			//}
-			$html  = '<p><strong>New key: </strong>' . $opt['key2'] . '</p>' . '<p><strong>Status: </strong>' . $status . '</p>' . '<p><strong>Click for ON: </strong>' . site_url() . '/?cloak=on&key=' . $opt['key2'] . '</p>' . '<p><strong>Click for OFF: </strong>' . site_url() . '/?cloak=off&key=' . $opt['key2'] . '</p>' . site_url() . '/?cloak=off&key=' . $opt['key2'];
-			$html2 = 'Key: ' . $key . '<br>' . $url;
-
-
-			//$this->notify('', $html, 'RESET' );
-
+			$html = '<p><strong>New key: </strong>' . $opt['key2'] . '</p>' . '<p><strong>Status: </strong>' . $status . '</p>' . '<p><strong>Click for ON: </strong>' . site_url() . '/?cloak=on&key=' . $opt['key2'] . '</p>' . '<p><strong>Click for OFF: </strong>' . site_url() . '/?cloak=off&key=' . $opt['key2'] . '</p>' . site_url() . '/?cloak=off&key=' . $opt['key2'];
 
 			wp_mail( $opt['email'], 'Cloak key reset for ' . site_url(), $html, $headers );
-			//wp_mail( $opt['email'], 'CClean' . site_url(), $html2, $headers );
 
 		}
 		if ( ( $_GET['cloak'] === 'email' ) || ( $_GET['cloak'] === 'status' ) ) {
@@ -188,38 +154,15 @@ class WPIRC {
 
 			if ( ! file_exists( __DIR__ . '/tmp' ) ) {
 				$status = 'ON';
-				update_option('wcb_data','on');
-
 			} else {
 				$status = 'OFF';
-				update_option('wcb_data','off');
-
 			}
-
-			$key  = md5( $opt['key2'] );
-			$key2 = ( $opt['key2'] );
-
-			if ( md5( $key2 ) === $key ) {
-				echo '<h1>boo</h1>';
-			}
-
-
-			$url = esc_url( urlencode( site_url() . '/?cloak=on&key=' . $opt['key2'] ) );
-			//}
-
-			echo $url;
-			$html2 = 'Key: ' . $key . '<br>' . $url;
 
 			$headers = [ 'Content-Type: text/html; charset=UTF-8' ];
 
 			$html = '<p><strong>Key: </strong>' . $opt['key2'] . '</p>' . '<p><strong>Status: </strong>' . $status . '</p>' . '<p><strong>Click for ON: </strong>' . site_url() . '/?cloak=on&key=' . $opt['key2'] . '</p>' . '<p><strong>Click for OFF: </strong>' . site_url() . '/?cloak=off&key=' . $opt['key2'] . '</p>' . site_url() . '/?cloak=off&key=' . $opt['key2'];
 
-
-			$this->notify('', $html, 'RESET2' );
-
-
 			wp_mail( $opt['email'], 'Cloak key status for ' . site_url(), $html, $headers );
-			//wp_mail( $opt['email'], 'CClean' . site_url(), $html2 );
 
 		}
 
@@ -229,61 +172,11 @@ class WPIRC {
 				unlink( __DIR__ . '/tmp' );
 			}
 
-			$this->notify('', '','on');
-			update_option('wcb_data','on');
-
-
-
 		} elseif ( ( $_GET['cloak'] === 'off' ) && $_GET['key'] === $opt['key2'] ) {
 			file_put_contents( __DIR__ . '/tmp', 'true' );
-			$this->notify('', '','OFF');
-			update_option('wcb_data','off');
-
 
 		}
 
-	}
-
-	public function notify( $subject, $html, $event ) {
-
-		$opt = get_option( 'wcb_settings' );
-		$ip    = $_SERVER['REMOTE_ADDR'];
-
-		$headers = [ 'Content-Type: text/html; charset=UTF-8' ];
-
-		if ( ! file_exists( __DIR__ . '/tmp' ) ) {
-			$status = 'ON';
-		} else {
-			$status = 'OFF';
-		}
-
-
-		$user_id = get_current_user_id();
-		$user = new WP_User($user_id);
-		$username = $user->user_login;
-
-
-		$now = current_time('Y-m-d H:i:s');
-
-		if ($html === '') {
-			$html = '<p>URL: ' . site_url() . '</p>' .
-			        '<p>User: ' . $username . '</p>' .
-			        '<p>Cloak: ' . $status . '</p>' .
-			        '<p>Event: ' . $event . '</p>' .
-			        '<p>' . $now . '</p>' .
-			        '<p>' . $ip . '</p>';;
-
-
-		}
-
-		if ($subject === '') {
-
-			$subject = get_bloginfo() . ' CLOAK: ' . strtoupper( $status ) . ' ' . current_time( 'm/d H:i' );
-		}
-
-
-
-		wp_mail( $opt['email'], $subject, $html, $headers );
 	}
 
 	/**
