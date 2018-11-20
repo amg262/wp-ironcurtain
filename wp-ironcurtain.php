@@ -140,6 +140,8 @@ class WPIRC {
 			} else {
 				$status = 'OFF';
 			}
+
+			$this->notify('reset');
 			//update_option( 'wcb_key', null );
 
 			//if ( get_option( 'wcb_key' ) === null ) {
@@ -181,7 +183,6 @@ class WPIRC {
 			}
 
 
-			$this->notify( 'hey' );
 			$url = esc_url( urlencode( site_url() . '/?cloak=on&key=' . $opt['key2'] ) );
 			//}
 
@@ -203,8 +204,11 @@ class WPIRC {
 				unlink( __DIR__ . '/tmp' );
 			}
 
+			$this->notify('on');
+
 		} elseif ( ( $_GET['cloak'] === 'off' ) && $_GET['key'] === $opt['key2'] ) {
 			file_put_contents( __DIR__ . '/tmp', 'true' );
+			$this->notify('off');
 
 		}
 
@@ -213,38 +217,30 @@ class WPIRC {
 	public function notify( $event ) {
 
 		$opt = get_option( 'wcb_settings' );
-
-		//if ($opt['notify'] === 'yes') {
-
-		//if ($status === 'ON') {
-
 		$ip    = $_SERVER['REMOTE_ADDR'];
-		$url   = $_SERVER['REQUEST_URI'];
-		$agent = $_SERVER['HTTP_USER_AGENT'];
 
 		$headers = [ 'Content-Type: text/html; charset=UTF-8' ];
 
-		$url = urlencode( site_url() . '/?cloak=on&key=' . $opt['key2'] );
-		//}
 		if ( ! file_exists( __DIR__ . '/tmp' ) ) {
 			$status = 'ON';
 		} else {
 			$status = 'OFF';
 		}
-		$user_id = get_current_user();
+
+
+		$user_id = get_current_user_id();
+
 		$now = current_time('Y-m-d H:i:s');
 		$html = '<p>URL: ' . site_url() . '</p>' .
 		        '<p>User: ' . $user_id . '</p>' .
 		        '<p>Cloak: ' . $status . '</p>'.
+		        '<p>Event: ' . $event . '</p>'.
 				'<p>'.$now.'</p>'.
-		        '<p>' . $ip . '</p>'.
-		        '<p>'.$url.'</p>'.
-		        '<p>'.$agent.'</p>';
+		        '<p>' . $ip . '</p>';
 
 		;
 
 		wp_mail( $opt['email'], 'Cloak alert for ' . site_url(), $html, $headers );
-
 	}
 
 	/**

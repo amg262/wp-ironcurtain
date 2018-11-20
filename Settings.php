@@ -74,7 +74,14 @@ class Settings {
 					'default' => $key,
 					//'sanitize_callback' => 'intval',
 				],
-
+				[
+					'name'    => 'key',
+					'label'   => __( 'Secret Key', 'wedevs' ),
+					'desc'    => __( '<i>http://rbrvs.net/?cloak=on&<b>key=</b> *this field </i>', 'wedevs' ),
+					'type'    => 'password',
+					'default' => 'yo',
+					//'sanitize_callback' => 'intval',
+				],
 				[
 					'name'    => 'radio',
 					'label'   => __( 'Enable Cloak on Log Out', 'wedevs' ),
