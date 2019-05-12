@@ -50,8 +50,7 @@ class WPIRC {
 		require __DIR__ . '/Settings.php';
 
 		$settings = new Settings();
-
-		include_once __DIR__ .'/cron.php';
+		include_once __DIR__ . '/cron.php';
 
 		add_filter( 'plugin_action_links', [ $this, 'plugin_links' ], 10, 5 );
 		add_action( 'wp_logout', [ $this, 'logout_cloak' ] );
@@ -66,7 +65,9 @@ class WPIRC {
 			update_option( 'wcb_data', 'off' );
 
 		}
-		//add_action( 'init', [ $this, 'exec' ] );
+
+
+
 	}
 
 	/**
@@ -80,6 +81,36 @@ class WPIRC {
 
 		return static::$instance;
 	}
+
+
+
+	public function cron() {
+
+	// your code
+	$opts = get_option( 'wcb_settings' );
+		$data = get_option( 'wcb_data' );
+
+
+	if ( $opts['radio'] === 'yes' ) {
+		if ( file_exists( __DIR__ . '/tmp' ) ) {
+			unlink( __DIR__ . '/tmp' );
+
+			update_option( 'wcb_data', 'on' );
+
+		} else {
+			update_option( 'wcb_data', 'off' );
+
+		}
+	}
+
+	}
+
+
+
+// put this line inside a function,
+// presumably in response to something the user does
+// otherwise it will schedule a new event on every page visit
+
 
 	/**
 	 *
@@ -115,7 +146,7 @@ class WPIRC {
 		$opts = get_option( 'wcb_settings' );
 
 
-		if ($opts['event'] > 0) {
+		if ( $opts['event'] > 0 ) {
 
 		}
 
