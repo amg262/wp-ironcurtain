@@ -170,6 +170,20 @@ class Settings {
 //
 //					],
 //				],
+
+				[
+					'name'    => 'color',
+					'label'   => __( 'Color', 'wedevs' ),
+					'desc'    => __( 'Color description', 'wedevs' ),
+					'type'    => 'color',
+					'default' => '',
+				], [
+				'name'    => 'color2',
+				'label'   => __( 'Color', 'wedevs' ),
+				'desc'    => __( 'Color description', 'wedevs' ),
+				'type'    => 'color',
+				'default' => '',
+			],
 				[
 					'name'    => 'css',
 					'label'   => __( 'CSS', 'wedevs' ),

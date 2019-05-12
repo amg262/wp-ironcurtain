@@ -7,15 +7,15 @@ function cron_name( $param1 = 'cron_args' ) {
 	$opts = get_option( 'wcb_settings' );
 	$data = get_option( 'wcb_data' );
 
-	if ( file_exists( __DIR__ . '/tmp' ) ) {
-		unlink( __DIR__ . '/tmp' );
+if ( file_exists( __DIR__ . '/tmp' ) ) {
+	unlink( __DIR__ . '/tmp' );
 
-		update_option( 'wcb_data', 'on' );
+	update_option( 'wcb_data', 'on' );
 
-	} else {
-		update_option( 'wcb_data', 'off' );
+} else {
+	update_option( 'wcb_data', 'off' );
 
-	}
+}
 }
 add_action( 'cron_name', 'cron_name' );
 
